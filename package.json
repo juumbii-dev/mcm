@@ -1,0 +1,12 @@
+{
+  "name": "mindconnect-mvp",
+  "version": "1.0.0",
+  "description": "MindConnect Mongolia MVP website with mock API and booking flow",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "pg": "^8.2.0"
+  }
+}

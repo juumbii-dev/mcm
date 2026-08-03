@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/api/psychologists", "dest": "/api/psychologists.js" },
+    { "src": "/api/psychologists/(.*)", "dest": "/api/psychologists.js" },
+    { "src": "/api/bookings", "dest": "/api/bookings.js" },
+    { "src": "/api/auth", "dest": "/api/auth.js" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}

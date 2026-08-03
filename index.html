@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindConnect Mongolia | Онлайн сэтгэлзүйн зөвлөгөө</title>
+    <meta
+      name="description"
+      content="MindConnect Mongolia нь найдвартай сэтгэл зүйчтэй онлайнаар холбогдож, цаг захиалах, төлбөрөө төлж, видео зөвлөгөө авах боломжийг олгодог MVP платформ."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header site-header--dark">
+      <div class="container nav-wrap">
+        <a class="brand brand--light" href="index.html">
+          <span class="brand-mark">M</span>
+          <span>MindConnect Mongolia</span>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="site-nav site-nav--dark">
+          <a href="index.html">Нүүр хуудас</a>
+          <a href="pages/psychologists.html">Сэтгэл зүйчид</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contact">Холбоо барих</a>
+          <a href="pages/login.html" class="nav-cta">Нэвтрэх</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero hero--jobs">
+        <div class="container hero-grid hero-grid--jobs">
+          <div class="hero-copy">
+            <div class="hero-badges">
+              <span class="pill">Өөрийгөө хөгжүүлэх зам</span>
+              <span class="pill subtle">Мэргэжлийн зөвлөгчтэй холбогдох</span>
+            </div>
+            <h1>Сэтгэл зүйн дэмжлэгийг одоо л олж, амьдралаа илүү амар болго.</h1>
+            <p>MindConnect нь мэргэжлийн сэтгэл зүйчидтэй холбогдож, цаг захиалга хийж, үр дүнтэй зөвлөгөөг онлайнаар авахад туслана.</p>
+            <div class="hero-actions hero-actions--jobs">
+              <a class="btn btn-primary" href="pages/psychologists.html">Сэтгэл зүйч хайх</a>
+              <a class="btn btn-secondary" href="pages/register.html">Бүртгүүлэх</a>
+            </div>
+            <ul class="hero-stats">
+              <li><strong>1300+</strong> Цаг захиалга</li>
+              <li><strong>300+</strong> Сэтгэл зүйч</li>
+              <li><strong>3000+</strong> Сарын хэрэглэгч</li>
+            </ul>
+          </div>
+
+          <div class="hero-visual">
+            <div class="visual-card">
+              <span class="visual-label">Онцлох зөвлөгч</span>
+              <img class="hero-image" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80" alt="Professional woman" />
+              <div class="visual-meta">
+                <p>А. Мягмар</p>
+                <strong>Сэтгэл зүйч · Хүүхэд, гэр бүлийн чиглэл</strong>
+              </div>
+            </div>
+            <div class="hero-feature-card">
+              <p class="eyebrow">Хамгийн шилдэг</p>
+              <h3>Мэргэжлийн өсөлтөд таны хамтрагч</h3>
+              <ul class="hero-card-list">
+                <li>Итгэлтэй сэтгэл зүйчид</li>
+                <li>Хялбар цаг захиалга</li>
+                <li>Онлайн уулзалтын дэмжлэг</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Үйлчилгээ</p>
+            <h2>Энэ MVP-д юу багтсан бэ?</h2>
+          </div>
+          <div class="feature-grid">
+            <article class="info-card">
+              <div class="card-icon">01</div>
+              <h3>Сэтгэл зүйч хайх</h3>
+              <p>Чиглэл, үнэ, хот, үнэлгээний дагуу шүүлтүүрээр хайж олоорой.</p>
+            </article>
+            <article class="info-card">
+              <div class="card-icon">02</div>
+              <h3>Цаг захиалах</h3>
+              <p>Сул цагийг хараад хүссэн өдөр, цаг хугацааг шууд сонгоорой.</p>
+            </article>
+            <article class="info-card">
+              <div class="card-icon">03</div>
+              <h3>Онлайн уулзалт</h3>
+              <p>Google Meet эсвэл Jitsi-ээр аюулгүй видео зөвлөгөө аваарай.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section alt-bg">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Сэтгэл зүйчид</p>
+            <h2>Санал болгож буй мэргэжилтнүүд</h2>
+          </div>
+          <div id="psychologist-list" class="cards-grid psychologist-grid"></div>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">FAQ</p>
+            <h2>Түгээмэл асуултууд</h2>
+          </div>
+          <div class="faq-list">
+            <details open>
+              <summary>Онлайн зөвлөгөө хэрхэн эхэлдэг вэ?</summary>
+              <p>Сэтгэл зүйч сонгож, цаг захиалж, төлбөрөө төлсний дараа видео чат руу орно.</p>
+            </details>
+            <details>
+              <summary>Төлбөр ямар аргаар хийх боломжтой вэ?</summary>
+              <p>QPay, SocialPay, банкны картаар төлбөр хийх боломжтой.</p>
+            </details>
+            <details>
+              <summary>Хэрэв цагийг өөрчлөх шаардлагатай бол?</summary>
+              <p>Сонгосон цагийн өмнөх 24 цагийн дотор админтай холбогдож өөрчлөх боломжтой.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="section contact-section" id="contact">
+        <div class="container contact-card">
+          <div>
+            <p class="eyebrow">Холбоо барих</p>
+            <h2>Асуулт байвал бидэнтэй холбогдоорой.</h2>
+            <p>Бид танд зориулж MVP-ийн туршилтыг тасралтгүй сайжруулж байна.</p>
+          </div>
+          <a class="btn btn-primary" href="mailto:hello@mindconnect.mn">hello@mindconnect.mn</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-wrap">
+        <p>© 2026 MindConnect Mongolia</p>
+        <div>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

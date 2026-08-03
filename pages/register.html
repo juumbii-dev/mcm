@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Бүртгүүлэх | MindConnect Mongolia</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark">M</span>
+          <span>MindConnect Mongolia</span>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="site-nav">
+          <a href="../index.html">Нүүр хуудас</a>
+          <a href="psychologists.html">Сэтгэл зүйчид</a>
+          <a href="../index.html#faq">FAQ</a>
+          <a href="../index.html#contact">Холбоо барих</a>
+          <a href="login.html" class="nav-cta">Нэвтрэх</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 3rem 0;">
+      <section class="form-card">
+        <p class="eyebrow">Бүртгэл</p>
+        <h1 class="page-title">Шинэ хэрэглэгч болгох</h1>
+        <p class="page-subtitle">Имэйл болон утасны баталгаажуулалтаар бүртгүүлээрэй.</p>
+        <form id="register-form">
+          <input type="text" name="name" placeholder="Нэр" required />
+          <input type="email" name="email" placeholder="Имэйл" required />
+          <input type="tel" name="phone" placeholder="Утас" />
+          <input type="password" name="password" placeholder="Нууц үг" required />
+          <button class="btn btn-primary" type="submit">Бүртгүүлэх</button>
+        </form>
+        <p style="margin-top: 1rem;">Бүртгэлтэй юу? <a class="form-link" href="login.html">Нэвтрэх</a></p>
+      </section>
+    </main>
+
+    <script src="../script.js"></script>
+  </body>
+</html>
