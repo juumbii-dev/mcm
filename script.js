@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const authLink = document.querySelector('.nav-cta');
+  const apiBase = (window.location.origin === 'null' || window.location.origin === 'file:')
+    ? 'http://localhost:8000'
+    : window.location.origin;
 
   const renderAuthState = () => {
     const state = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
@@ -96,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const psychologistList = document.getElementById('psychologist-list');
   if (psychologistList) {
-    const response = await fetch('/api/psychologists');
+    const response = await fetch(`${apiBase}/api/psychologists`);
     const psychologists = await response.json();
     psychologistList.innerHTML = psychologists.map((psychologist) => `
       <article class="psych-card">
@@ -116,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (detailContainer) {
     const params = new URLSearchParams(window.location.search);
     const psychologistId = params.get('id') || '1';
-    const response = await fetch(`/api/psychologists/${psychologistId}`);
+    const response = await fetch(`${apiBase}/api/psychologists/${psychologistId}`);
     const psychologist = await response.json();
 
     detailContainer.innerHTML = `
@@ -167,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         notes: formData.get('notes')
       };
 
-      const response = await fetch('/api/bookings', {
+      const response = await fetch(`${apiBase}/api/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

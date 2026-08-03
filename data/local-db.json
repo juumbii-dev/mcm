@@ -1,5 +1,22 @@
 {
-  "users": [],
+  "users": [
+    {
+      "id": 1,
+      "name": "Test",
+      "email": "test@example.com",
+      "phone": "",
+      "created_at": "2026-08-03T15:38:47.629Z",
+      "password_hash": "fcf730b6d95236ecd3c9fc2d92d7b6b2bb061514961aec041d6c7a7192f592e4"
+    },
+    {
+      "id": 2,
+      "name": "b",
+      "email": "useopenthis@gmail.com",
+      "phone": "h",
+      "created_at": "2026-08-03T15:39:09.574Z",
+      "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"
+    }
+  ],
   "psychologists": [
     {
       "id": 1,
@@ -50,6 +67,27 @@
       ]
     }
   ],
-  "bookings": [],
+  "bookings": [
+    {
+      "id": 1,
+      "psychologist_id": 1,
+      "user_name": "w",
+      "user_email": "useopenthis@gmail.com",
+      "slot": "10:00",
+      "notes": "ttttt",
+      "status": "pending",
+      "created_at": "2026-08-03T15:43:38.345Z"
+    },
+    {
+      "id": 2,
+      "psychologist_id": 1,
+      "user_name": "w",
+      "user_email": "useopenthis@gmail.com",
+      "slot": "16:00",
+      "notes": "ttttt",
+      "status": "pending",
+      "created_at": "2026-08-03T15:43:45.948Z"
+    }
+  ],
   "created_at": "2026-08-03T15:33:28.784Z"
 }
