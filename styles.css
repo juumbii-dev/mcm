@@ -46,7 +46,7 @@ a {
   color: white;
 }
 
-.site-header--dark .nav-cta {
+.site-header--dark .nav-cta:not(.auth-pill) {
   background: #ffffff;
   color: #1f2937;
 }
