@@ -184,10 +184,11 @@ a {
   font-size: clamp(2.8rem, 4vw, 4.6rem);
   line-height: 1.02;
   max-width: 680px;
+  color: #ffffff;
 }
 
 .hero-copy p {
-  color: rgba(226, 232, 240, 0.88);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 1.05rem;
   max-width: 640px;
   margin-bottom: 1.8rem;
@@ -715,6 +716,31 @@ a {
   border-radius: 0.8rem;
   text-align: center;
   background: #f9fafb;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.slot:hover {
+  background: #eef2ff;
+}
+
+.slot.active {
+  border-color: var(--primary);
+  background: var(--accent);
+  transform: translateY(-1px);
+}
+
+.selected-slot-text {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.booking-note {
+  margin: 0.4rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 .slot.active {

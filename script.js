@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const psychologistId = params.get('id') || '1';
     const response = await fetch(`${apiBase}/api/psychologists/${psychologistId}`);
     const psychologist = await response.json();
+    const selectedSlotInitial = psychologist.availability[0] || '';
 
     detailContainer.innerHTML = `
       <article class="info-card">
@@ -139,11 +140,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="booking-grid">
           ${psychologist.availability.map((slot) => `<button class="slot" data-slot="${slot}">${slot}</button>`).join('')}
         </div>
+        <p class="selected-slot-text">Сонгосон цаг: <strong id="selected-slot-text">${selectedSlotInitial}</strong></p>
+        <p class="booking-note">Нэр, имэйл шаардлагагүй. Цаг сонгоход захиалга бүртгэгдэнэ.</p>
         <form id="booking-form" style="margin-top: 1rem;">
-          <input type="text" name="name" placeholder="Нэр" required />
-          <input type="email" name="email" placeholder="Имэйл" required />
+          <input type="text" name="name" placeholder="Нэр (заавал биш)" />
+          <input type="email" name="email" placeholder="Имэйл (заавал биш)" />
           <input type="hidden" name="psychologistId" value="${psychologist.id}" />
-          <input type="hidden" name="selectedSlot" id="selected-slot" />
+          <input type="hidden" name="selectedSlot" id="selected-slot" value="${selectedSlotInitial}" />
           <textarea name="notes" rows="4" placeholder="Тэмдэглэл"></textarea>
           <button class="btn btn-primary" type="submit">Баталгаажуулах</button>
         </form>
@@ -155,6 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.slot').forEach((item) => item.classList.remove('active'));
         slot.classList.add('active');
         document.getElementById('selected-slot').value = slot.dataset.slot;
+        document.getElementById('selected-slot-text').textContent = slot.dataset.slot;
       });
     });
 
@@ -164,9 +168,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const formData = new FormData(bookingForm);
       const payload = {
         psychologistId: Number(formData.get('psychologistId')),
-        name: formData.get('name'),
-        email: formData.get('email'),
-        slot: formData.get('selectedSlot') || psychologist.availability[0],
+        name: formData.get('name') || '',
+        email: formData.get('email') || '',
+        slot: formData.get('selectedSlot') || psychologist.availability[0] || '',
         notes: formData.get('notes')
       };
 
