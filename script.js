@@ -409,7 +409,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   // If on homepage, replace hero copy with counselor profile when a counselor is logged in
   try {
     const heroCopy = document.querySelector('.hero-copy');
-    if (heroCopy && authState?.user && (authState.user.role === 'counselor' || authState.user.psychologistId)) {
+    const stored = localStorage.getItem('mindconnect-auth');
+    console.debug('hero: authState', authState, 'localStorage.mindconnect-auth present?', !!stored);
+    // Broaden condition: show profile when user appears to have counselor-like fields
+    const isCounselorLike = !!(authState?.user && (
+      authState.user.role === 'counselor' ||
+      authState.user.psychologistId ||
+      authState.user.expertise ||
+      authState.user.qualifications
+    ));
+    if (heroCopy && isCounselorLike) {
       const u = authState.user;
       const heroAvatar = u.avatar
         ? `<img src="${u.avatar}" alt="avatar" style="width:120px;height:120px;object-fit:cover;border-radius:12px;"/>`
