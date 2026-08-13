@@ -416,6 +416,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     const dashboardHeading = document.getElementById('dashboard-heading');
     dashboardHeading.textContent = `Тавтай морил, ${authState.user.name}`;
 
+    // Render counselor profile panel
+    const profileEl = document.getElementById('counselor-profile');
+    if (profileEl) {
+      const avatar = authState.user.avatar || '';
+      const avatarHtml = avatar
+        ? `<img src="${avatar}" alt="avatar" style="width:88px;height:88px;object-fit:cover;border-radius:8px;"/>`
+        : `<div style="width:88px;height:88px;display:flex;align-items:center;justify-content:center;background:var(--muted);color:white;border-radius:8px;font-size:28px">${(authState.user.name||'')[0]||''}</div>`;
+
+      const infoHtml = `
+        <div style="display:flex;gap:1rem;align-items:flex-start">
+          ${avatarHtml}
+          <div>
+            <div style="font-weight:600">${authState.user.name || '—'}</div>
+            <div style="color:var(--muted);margin-top:0.25rem">${authState.user.profession || authState.user.expertise || ''}</div>
+            <div style="margin-top:0.5rem;color:var(--muted)">Туршлага: ${authState.user.experience || 0} жил · Хот: ${authState.user.city || '—'}</div>
+            <div style="margin-top:0.5rem;max-width:50ch">${authState.user.bio || ''}</div>
+          </div>
+        </div>
+      `;
+      profileEl.innerHTML = infoHtml;
+    }
+
     const bookingsContainer = document.getElementById('booking-list');
     const bookingTemplate = (booking) => `
       <article class="booking-item">
