@@ -621,6 +621,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const profilePage = document.getElementById('profile-page');
   if (profilePage) {
+      // populate psychologist select options
+      const psychologistSelect = document.getElementById('profile-psychologistId');
+      if (psychologistSelect) {
+        try {
+          const resp = await fetch(`${apiBase}/api/psychologists`);
+          if (resp.ok) {
+            const list = await resp.json();
+            psychologistSelect.innerHTML = '<option value="">Сэтгэл зүйч сонго</option>' + list.map(p => `<option value="${p.id}">${p.name} — ${p.city}</option>`).join('');
+          }
+        } catch (err) {
+          // ignore
+        }
+      }
     const state = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
     if (!state?.user) {
       window.location.href = `${pagePrefix}login.html`;
