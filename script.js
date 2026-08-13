@@ -47,6 +47,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
+    // Hide any register links/buttons when logged in
+    const registerSelectors = ['a[href$="register.html"]', 'a[href$="/register.html"]', 'a.btn-secondary[href*="register"]', 'a.form-link[href*="register"]'];
+    registerSelectors.forEach((sel) => {
+      document.querySelectorAll(sel).forEach((el) => {
+        if (state?.user) el.style.display = 'none';
+        else el.style.display = '';
+      });
+    });
+
     if (state?.user && authLink) {
       authLink.className = 'nav-cta auth-pill';
       authLink.innerHTML = `
@@ -504,6 +513,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const phoneInput = document.getElementById('profile-phone');
     const bioInput = document.getElementById('profile-bio');
     const pwdInput = document.getElementById('profile-password');
+    const avatarInput = document.getElementById('profile-avatar');
+    const avatarPreview = document.getElementById('profile-avatar-preview');
     const counselorFields = document.getElementById('counselor-fields');
     const clientFields = document.getElementById('client-fields');
     const psychologistSelect = document.getElementById('profile-psychologistId');
@@ -518,6 +529,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     emailInput.value = state.user.email || '';
     phoneInput.value = state.user.phone || '';
     bioInput.value = state.user.bio || '';
+    // avatar preview
+    if (avatarPreview) {
+      if (state.user.avatar) {
+        avatarPreview.src = state.user.avatar;
+        avatarPreview.style.display = 'block';
+      } else {
+        avatarPreview.style.display = 'none';
+      }
+    }
     if (state.user.role === 'counselor') {
       counselorFields.style.display = 'block';
       clientFields.style.display = 'none';
@@ -530,6 +550,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       counselorFields.style.display = 'none';
       cityInput.value = state.user.city || '';
       ageInput.value = state.user.age || '';
+    }
+
+    let avatarDataUrl = null;
+    if (avatarInput) {
+      avatarInput.addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          avatarDataUrl = reader.result;
+          if (avatarPreview) {
+            avatarPreview.src = avatarDataUrl;
+            avatarPreview.style.display = 'block';
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
     const loadProfileBookings = async () => {
@@ -658,6 +695,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         payload.experience = experienceInput.value ? Number(experienceInput.value) : 0;
         payload.expertise = expertiseInput.value || null;
         payload.qualifications = qualificationsInput.value || null;
+        if (avatarDataUrl) payload.avatar = avatarDataUrl;
       } else {
         payload.city = cityInput.value || null;
         payload.age = ageInput.value ? Number(ageInput.value) : null;

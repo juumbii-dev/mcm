@@ -11,7 +11,7 @@ async function handleAuth(req, res) {
       const data = JSON.parse(body);
       console.log('AUTH_PAYLOAD', data && data.action);
       if (data.action === 'register') {
-        const { name, email, phone, password, role, psychologistId, bio, experience, expertise, qualifications, city, age } = data;
+        const { name, email, phone, password, role, psychologistId, bio, experience, expertise, qualifications, city, age, avatar } = data;
         if (!name || !email || !password) {
           res.statusCode = 400;
           res.end(JSON.stringify({ error: 'Name, email and password are required' }));
@@ -33,6 +33,7 @@ async function handleAuth(req, res) {
           role: role || 'client',
           psychologistId: role === 'counselor' ? Number(psychologistId) || null : null,
           bio: bio || null,
+          avatar: avatar || null,
           experience: experience || 0,
           expertise: expertise || null,
           qualifications: qualifications || null,
@@ -61,7 +62,7 @@ async function handleAuth(req, res) {
       }
 
       if (data.action === 'update') {
-        const { id, name, email, phone, role, psychologistId, password, bio, experience, expertise, qualifications, city, age } = data;
+        const { id, name, email, phone, role, psychologistId, password, bio, experience, expertise, qualifications, city, age, avatar } = data;
         if (!id) {
           res.statusCode = 400;
           res.end(JSON.stringify({ error: 'User id required' }));
@@ -72,6 +73,7 @@ async function handleAuth(req, res) {
         if (email !== undefined) update.email = email.toLowerCase();
         if (phone !== undefined) update.phone = phone;
         if (bio !== undefined) update.bio = bio;
+        if (avatar !== undefined) update.avatar = avatar;
         if (experience !== undefined) update.experience = experience;
         if (expertise !== undefined) update.expertise = expertise;
         if (qualifications !== undefined) update.qualifications = qualifications;
