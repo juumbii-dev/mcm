@@ -1,4 +1,4 @@
-const { initDatabase, hashPassword, findUserByEmail, createUser, findUserByCredentials, updateUser } = require('../lib/db');
+const { initDatabase, hashPassword, findUserByEmail, createUser, findUserByCredentials, updateUser, getPsychologistById } = require('../lib/db');
 
 async function handleAuth(req, res) {
   await initDatabase();
@@ -47,8 +47,13 @@ async function handleAuth(req, res) {
           passwordHash: hashPassword(password),
         });
 
+        // attach linked psychologist if present
+        let psychologist = null;
+        if (user.psychologistId) {
+          psychologist = await getPsychologistById(user.psychologistId);
+        }
         res.statusCode = 201;
-        res.end(JSON.stringify({ user, token: `token-${user.id}` }));
+        res.end(JSON.stringify({ user: { ...user, psychologist }, token: `token-${user.id}` }));
         return;
       }
 
@@ -61,8 +66,12 @@ async function handleAuth(req, res) {
           return;
         }
 
+        let psychologist = null;
+        if (user.psychologistId) {
+          psychologist = await getPsychologistById(user.psychologistId);
+        }
         res.statusCode = 200;
-        res.end(JSON.stringify({ user, token: `token-${user.id}` }));
+        res.end(JSON.stringify({ user: { ...user, psychologist }, token: `token-${user.id}` }));
         return;
       }
 
@@ -100,8 +109,12 @@ async function handleAuth(req, res) {
           return;
         }
 
+        let psychologist = null;
+        if (user.psychologistId) {
+          psychologist = await getPsychologistById(user.psychologistId);
+        }
         res.statusCode = 200;
-        res.end(JSON.stringify({ user, token: `token-${user.id}` }));
+        res.end(JSON.stringify({ user: { ...user, psychologist }, token: `token-${user.id}` }));
         return;
       }
 

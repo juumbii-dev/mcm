@@ -420,6 +420,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Render counselor profile panel
     const profileEl = document.getElementById('counselor-profile');
     if (profileEl) {
+      // if linked psychologist data is not present on user, fetch it
+      let linkedPsych = authState.user.psychologist || null;
+      if (!linkedPsych && authState.user.psychologistId) {
+        try {
+          const r = await fetch(`${apiBase}/api/psychologists/${authState.user.psychologistId}`);
+          if (r.ok) linkedPsych = await r.json();
+        } catch (err) {
+          // ignore
+        }
+      }
       const avatar = authState.user.avatar || '';
       const avatarHtml = avatar
         ? `<img src="${avatar}" alt="avatar" style="width:88px;height:88px;object-fit:cover;border-radius:8px;"/>`
@@ -432,6 +442,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div style="font-weight:600">${authState.user.name || '—'}</div>
             <div style="color:var(--muted);margin-top:0.25rem">${authState.user.profession || authState.user.expertise || ''}</div>
             <div style="margin-top:0.5rem;color:var(--muted)">Туршлага: ${authState.user.experience || 0} жил · Хот: ${authState.user.city || '—'}</div>
+            <div style="margin-top:0.5rem;color:var(--muted)">Холбогдсон сэтгэл зүйч: ${linkedPsych ? linkedPsych.name : (authState.user.psychologistId ? 'Тухайн ID-тай' : '—')}</div>
             <div style="margin-top:0.5rem;max-width:50ch">${authState.user.bio || ''}</div>
           </div>
         </div>
