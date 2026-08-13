@@ -47,7 +47,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (url.pathname === '/api/bookings') {
+  if (url.pathname === '/api/bookings' || url.pathname.startsWith('/api/bookings/')) {
     await handleBookings(req, res);
     return;
   }

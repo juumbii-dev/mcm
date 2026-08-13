@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Профайл | MindConnect Mongolia</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark">M</span>
+          <span>MindConnect Mongolia</span>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="site-nav">
+          <a href="../index.html">Нүүр хуудас</a>
+          <a href="psychologists.html">Сэтгэл зүйчид</a>
+          <a href="../index.html#faq">FAQ</a>
+          <a href="../index.html#contact">Холбоо барих</a>
+          <a href="login.html" class="nav-cta">Нэвтрэх</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 3rem 0;">
+      <section class="form-card" id="profile-page">
+        <p class="eyebrow">Профайл</p>
+        <h1 class="page-title">Миний мэдээлэл</h1>
+        <p class="page-subtitle">Өөрийн мэдээллийг засах боломжтой.</p>
+
+        <form id="profile-form">
+          <label>Нэр<input type="text" name="name" id="profile-name" required /></label>
+          <label>Имэйл<input type="email" name="email" id="profile-email" required /></label>
+          <label>Утас<input type="tel" name="phone" id="profile-phone" /></label>
+          <label>Шинэ нууц үг (хэрэв өөрчлөв) <input type="password" name="password" id="profile-password" /></label>
+          <div id="counselor-fields" style="display:none;">
+            <label>Сэтгэл зүйчийн профайл
+              <select name="psychologistId" id="profile-psychologistId">
+                <option value="">Сэтгэл зүйч сонго</option>
+                <option value="1">А. Мягмар</option>
+                <option value="2">Б. Нандин</option>
+                <option value="3">Г. Төгс</option>
+              </select>
+            </label>
+          </div>
+          <button class="btn btn-primary" type="submit">Мэдээлэл хадгалах</button>
+        </form>
+
+        <hr style="margin:1.25rem 0;" />
+        <h2>Таны захиалгууд</h2>
+        <div id="profile-bookings" style="margin-top:0.75rem;"></div>
+      </section>
+    </main>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

@@ -1,10 +1,18 @@
-const { initDatabase, listBookings, createBooking } = require('../lib/db');
+const { initDatabase, listBookings, createBooking, updateBooking, deleteBooking } = require('../lib/db');
 
 async function handleBookings(req, res) {
   await initDatabase();
 
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const bookingId = url.pathname.split('/').pop();
+
   if (req.method === 'GET') {
-    const bookings = await listBookings();
+    const userEmail = url.searchParams.get('userEmail');
+    const psychologistId = url.searchParams.get('psychologistId');
+    const filter = {};
+    if (userEmail) filter.userEmail = userEmail;
+    if (psychologistId) filter.psychologistId = Number(psychologistId);
+    const bookings = await listBookings(filter);
     res.statusCode = 200;
     res.end(JSON.stringify(bookings));
     return;
@@ -22,6 +30,7 @@ async function handleBookings(req, res) {
           psychologistId: Number(data.psychologistId),
           name: data.name,
           email: data.email,
+          date: data.date,
           slot: data.slot,
           notes: data.notes || '',
         });
@@ -32,6 +41,41 @@ async function handleBookings(req, res) {
         res.end(JSON.stringify({ error: error.message || 'Booking failed' }));
       }
     });
+    return;
+  }
+
+  if (req.method === 'PUT' && bookingId && !isNaN(Number(bookingId))) {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+        const booking = await updateBooking(Number(bookingId), {
+          date: data.date,
+          slot: data.slot,
+          notes: data.notes,
+        });
+        res.statusCode = 200;
+        res.end(JSON.stringify(booking));
+      } catch (error) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: error.message || 'Booking update failed' }));
+      }
+    });
+    return;
+  }
+
+  if (req.method === 'DELETE' && bookingId && !isNaN(Number(bookingId))) {
+    try {
+      await deleteBooking(Number(bookingId));
+      res.statusCode = 204;
+      res.end();
+    } catch (error) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: error.message || 'Booking delete failed' }));
+    }
     return;
   }
 
