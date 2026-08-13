@@ -406,6 +406,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await updateHomeAppointment();
 
+  // If on homepage, replace hero copy with counselor profile when a counselor is logged in
+  try {
+    const heroCopy = document.querySelector('.hero-copy');
+    if (heroCopy && authState?.user && (authState.user.role === 'counselor' || authState.user.psychologistId)) {
+      const u = authState.user;
+      const heroAvatar = u.avatar
+        ? `<img src="${u.avatar}" alt="avatar" style="width:120px;height:120px;object-fit:cover;border-radius:12px;"/>`
+        : `<div style="width:120px;height:120px;border-radius:12px;background:var(--muted);color:white;display:flex;align-items:center;justify-content:center;font-size:40px">${(u.name||'')[0]||''}</div>`;
+
+      heroCopy.innerHTML = `
+        <div class="hero-badges">
+          <span class="pill">Зөвлөхийн профайл</span>
+        </div>
+        <div style="display:flex;gap:1.25rem;align-items:flex-start;flex-wrap:wrap">
+          <div style="flex:0 0 auto">${heroAvatar}</div>
+          <div style="min-width:0">
+            <h2 style="margin:0;font-size:1.6rem">${u.name || '—'}</h2>
+            <div style="color:var(--muted);margin-top:0.25rem">${u.expertise || u.profession || ''}</div>
+            <div style="margin-top:0.5rem;color:var(--muted)">Туршлага: ${u.experience || 0} жил · Хот: ${u.city || '—'}</div>
+            <p style="margin-top:0.6rem;max-width:60ch">${u.bio || 'Товч танилцуулга оруулаагүй байна.'}</p>
+            <div class="hero-actions hero-actions--jobs" style="margin-top:0.75rem">
+              <a class="btn btn-primary" href="pages/profile.html">Профайл харах</a>
+              <a class="btn btn-secondary" href="pages/profile.html">Профайл засах</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  } catch (e) {
+    console.error('Hero replace error', e);
+  }
+
   const counselorDashboard = document.getElementById('counselor-dashboard');
   if (counselorDashboard) {
     const authState = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
