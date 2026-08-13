@@ -11,7 +11,7 @@ async function handleAuth(req, res) {
       const data = JSON.parse(body);
       console.log('AUTH_PAYLOAD', data && data.action);
       if (data.action === 'register') {
-        const { name, email, phone, password, role, psychologistId } = data;
+        const { name, email, phone, password, role, psychologistId, bio, experience, expertise, qualifications, city, age } = data;
         if (!name || !email || !password) {
           res.statusCode = 400;
           res.end(JSON.stringify({ error: 'Name, email and password are required' }));
@@ -32,6 +32,12 @@ async function handleAuth(req, res) {
           phone: phone || '',
           role: role || 'client',
           psychologistId: role === 'counselor' ? Number(psychologistId) || null : null,
+          bio: bio || null,
+          experience: experience || 0,
+          expertise: expertise || null,
+          qualifications: qualifications || null,
+          city: city || null,
+          age: age || null,
           passwordHash: hashPassword(password),
         });
 
@@ -55,7 +61,7 @@ async function handleAuth(req, res) {
       }
 
       if (data.action === 'update') {
-        const { id, name, email, phone, role, psychologistId, password } = data;
+        const { id, name, email, phone, role, psychologistId, password, bio, experience, expertise, qualifications, city, age } = data;
         if (!id) {
           res.statusCode = 400;
           res.end(JSON.stringify({ error: 'User id required' }));
@@ -65,6 +71,12 @@ async function handleAuth(req, res) {
         if (name !== undefined) update.name = name;
         if (email !== undefined) update.email = email.toLowerCase();
         if (phone !== undefined) update.phone = phone;
+        if (bio !== undefined) update.bio = bio;
+        if (experience !== undefined) update.experience = experience;
+        if (expertise !== undefined) update.expertise = expertise;
+        if (qualifications !== undefined) update.qualifications = qualifications;
+        if (city !== undefined) update.city = city;
+        if (age !== undefined) update.age = age;
         if (role !== undefined) update.role = role;
         if (psychologistId !== undefined) update.psychologistId = role === 'counselor' ? Number(psychologistId) || null : null;
         if (password) update.passwordHash = hashPassword(password);

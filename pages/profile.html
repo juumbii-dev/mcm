@@ -36,6 +36,7 @@
           <label>Нэр<input type="text" name="name" id="profile-name" required /></label>
           <label>Имэйл<input type="email" name="email" id="profile-email" required /></label>
           <label>Утас<input type="tel" name="phone" id="profile-phone" /></label>
+          <label>Товч танилцуулга<textarea name="bio" id="profile-bio" rows="4"></textarea></label>
           <label>Шинэ нууц үг (хэрэв өөрчлөв) <input type="password" name="password" id="profile-password" /></label>
           <div id="counselor-fields" style="display:none;">
             <label>Сэтгэл зүйчийн профайл
@@ -46,6 +47,13 @@
                 <option value="3">Г. Төгс</option>
               </select>
             </label>
+            <label>Туршлага (жил) <input type="number" name="experience" id="profile-experience" min="0" /></label>
+            <label>Мэргэжил/Салбар <input type="text" name="expertise" id="profile-expertise" /></label>
+            <label>Гэрчилгээ/Төгсөлт <input type="text" name="qualifications" id="profile-qualifications" /></label>
+          </div>
+          <div id="client-fields" style="display:none;">
+            <label>Хот <input type="text" name="city" id="profile-city" /></label>
+            <label>Нас <input type="number" name="age" id="profile-age" min="0" /></label>
           </div>
           <button class="btn btn-primary" type="submit">Мэдээлэл хадгалах</button>
         </form>

@@ -502,17 +502,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     const nameInput = document.getElementById('profile-name');
     const emailInput = document.getElementById('profile-email');
     const phoneInput = document.getElementById('profile-phone');
+    const bioInput = document.getElementById('profile-bio');
     const pwdInput = document.getElementById('profile-password');
     const counselorFields = document.getElementById('counselor-fields');
+    const clientFields = document.getElementById('client-fields');
     const psychologistSelect = document.getElementById('profile-psychologistId');
+    const experienceInput = document.getElementById('profile-experience');
+    const expertiseInput = document.getElementById('profile-expertise');
+    const qualificationsInput = document.getElementById('profile-qualifications');
+    const cityInput = document.getElementById('profile-city');
+    const ageInput = document.getElementById('profile-age');
     const bookingsEl = document.getElementById('profile-bookings');
 
     nameInput.value = state.user.name || '';
     emailInput.value = state.user.email || '';
     phoneInput.value = state.user.phone || '';
+    bioInput.value = state.user.bio || '';
     if (state.user.role === 'counselor') {
       counselorFields.style.display = 'block';
+      clientFields.style.display = 'none';
       if (state.user.psychologistId) psychologistSelect.value = state.user.psychologistId;
+      experienceInput.value = state.user.experience || '';
+      expertiseInput.value = state.user.expertise || '';
+      qualificationsInput.value = state.user.qualifications || '';
+    } else {
+      clientFields.style.display = 'block';
+      counselorFields.style.display = 'none';
+      cityInput.value = state.user.city || '';
+      ageInput.value = state.user.age || '';
     }
 
     const loadProfileBookings = async () => {
@@ -626,6 +643,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         name: nameInput.value,
         email: emailInput.value,
         phone: phoneInput.value,
+        bio: bioInput.value || null,
       };
       if (pwdInput.value) {
         if (pwdInput.value.length < 6) {
@@ -637,6 +655,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (state.user.role === 'counselor') {
         payload.role = 'counselor';
         payload.psychologistId = psychologistSelect.value ? Number(psychologistSelect.value) : null;
+        payload.experience = experienceInput.value ? Number(experienceInput.value) : 0;
+        payload.expertise = expertiseInput.value || null;
+        payload.qualifications = qualificationsInput.value || null;
+      } else {
+        payload.city = cityInput.value || null;
+        payload.age = ageInput.value ? Number(ageInput.value) : null;
       }
 
       const res = await fetch(`${apiBase}/api/auth`, {
