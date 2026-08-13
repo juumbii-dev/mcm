@@ -1,4 +1,4 @@
-const { initDatabase, hashPassword, findUserByEmail, createUser, findUserByCredentials, updateUser, getPsychologistById } = require('../lib/db');
+const { initDatabase, hashPassword, findUserByEmail, createUser, findUserByCredentials, updateUser } = require('../lib/db');
 
 async function handleAuth(req, res) {
   await initDatabase();
@@ -47,13 +47,8 @@ async function handleAuth(req, res) {
           passwordHash: hashPassword(password),
         });
 
-        // attach linked psychologist if present
-        let psychologist = null;
-        if (user.psychologistId) {
-          psychologist = await getPsychologistById(user.psychologistId);
-        }
         res.statusCode = 201;
-        res.end(JSON.stringify({ user: { ...user, psychologist }, token: `token-${user.id}` }));
+        res.end(JSON.stringify({ user, token: `token-${user.id}` }));
         return;
       }
 
@@ -66,20 +61,34 @@ async function handleAuth(req, res) {
           return;
         }
 
-        let psychologist = null;
-        if (user.psychologistId) {
-          psychologist = await getPsychologistById(user.psychologistId);
-        }
         res.statusCode = 200;
-        res.end(JSON.stringify({ user: { ...user, psychologist }, token: `token-${user.id}` }));
+        res.end(JSON.stringify({ user, token: `token-${user.id}` }));
         return;
       }
 
       if (data.action === 'update') {
         const { id, name, email, phone, role, psychologistId, password, bio, experience, expertise, qualifications, city, age, avatar, gender, profession, marital_status, interests, issues } = data;
+        // Authorization: require Bearer token matching the user id
+        const authHeader = req.headers && (req.headers.authorization || req.headers.Authorization) || '';
+        const tokenMatch = (authHeader || '').toString().match(/^Bearer\s+token-(\d+)$/);
+        let tokenUserId = null;
+        if (tokenMatch) tokenUserId = Number(tokenMatch[1]);
+
+        if (!tokenUserId) {
+          res.statusCode = 401;
+          res.end(JSON.stringify({ error: 'Unauthorized: missing or invalid token' }));
+          return;
+        }
+
+        // If id provided, ensure it matches token user id
         if (!id) {
           res.statusCode = 400;
           res.end(JSON.stringify({ error: 'User id required' }));
+          return;
+        }
+        if (Number(id) !== tokenUserId) {
+          res.statusCode = 403;
+          res.end(JSON.stringify({ error: 'Forbidden: cannot update other user' }));
           return;
         }
         const update = {};
@@ -109,12 +118,8 @@ async function handleAuth(req, res) {
           return;
         }
 
-        let psychologist = null;
-        if (user.psychologistId) {
-          psychologist = await getPsychologistById(user.psychologistId);
-        }
         res.statusCode = 200;
-        res.end(JSON.stringify({ user: { ...user, psychologist }, token: `token-${user.id}` }));
+        res.end(JSON.stringify({ user, token: `token-${user.id}` }));
         return;
       }
 

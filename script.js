@@ -549,8 +549,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           city: cityField.value || null,
         };
         if (avatarData) payload.avatar = avatarData;
+        // attach Authorization header using stored token
+        const stored = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+        const headers = { 'Content-Type': 'application/json' };
+        if (stored && stored.token) headers.Authorization = `Bearer ${stored.token}`;
         const resp = await fetch(`${apiBase}/api/auth`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+          method: 'POST', headers, body: JSON.stringify(payload)
         });
         const result = await resp.json().catch(() => ({}));
         if (resp.ok) {
@@ -875,9 +879,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         payload.issues = issuesInput.value || null;
       }
 
+      const stored = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+      const headers = { 'Content-Type': 'application/json' };
+      if (stored && stored.token) headers.Authorization = `Bearer ${stored.token}`;
       const res = await fetch(`${apiBase}/api/auth`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload),
       });
       const result = await res.json();
