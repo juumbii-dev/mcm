@@ -31,6 +31,22 @@
         <p class="eyebrow">Зөвлөх самбар</p>
         <h1 class="page-title" id="dashboard-heading">Тавтай морил</h1>
         <div id="counselor-profile" style="margin:1rem 0 0.5rem; display:flex; gap:1rem; align-items:center;"></div>
+        <div id="counselor-profile-edit-wrap" style="margin-top:1rem;">
+          <button id="counselor-edit-toggle" class="btn btn-secondary">Профайлыг засах</button>
+          <form id="counselor-edit-form" style="display:none; margin-top:0.75rem; max-width:760px;">
+            <label>Нэр <input type="text" name="name" id="counselor-name" /></label>
+            <label>Товч танилцуулга <textarea name="bio" id="counselor-bio" rows="3"></textarea></label>
+            <label>Туршлага (жил) <input type="number" name="experience" id="counselor-experience" min="0" /></label>
+            <label>Мэргэжил/Салбар <input type="text" name="expertise" id="counselor-expertise" /></label>
+            <label>Хот <input type="text" name="city" id="counselor-city" /></label>
+            <label>Зураг <input type="file" name="avatar" id="counselor-avatar" accept="image/*" /></label>
+            <div style="margin-top:0.5rem;"><img id="counselor-avatar-preview" src="" alt="avatar" style="max-width:120px;border-radius:6px;display:none;" /></div>
+            <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
+              <button class="btn btn-primary" type="submit">Хадгалах</button>
+              <button class="btn" type="button" id="counselor-edit-cancel">Цуцлах</button>
+            </div>
+          </form>
+        </div>
         <p class="page-subtitle">Таны захиалгын жагсаалт болон засварлах боломж.</p>
         <div id="booking-list" style="margin-top: 1.5rem;"></div>
       </section>

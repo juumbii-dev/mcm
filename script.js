@@ -438,6 +438,92 @@ document.addEventListener('DOMContentLoaded', async () => {
       profileEl.innerHTML = infoHtml;
     }
 
+    // Setup edit form for counselor profile on dashboard
+    const editToggle = document.getElementById('counselor-edit-toggle');
+    const editForm = document.getElementById('counselor-edit-form');
+    const cancelBtn = document.getElementById('counselor-edit-cancel');
+    const nameField = document.getElementById('counselor-name');
+    const bioField = document.getElementById('counselor-bio');
+    const expField = document.getElementById('counselor-experience');
+    const expertiseField = document.getElementById('counselor-expertise');
+    const cityField = document.getElementById('counselor-city');
+    const avatarField = document.getElementById('counselor-avatar');
+    const avatarPreview = document.getElementById('counselor-avatar-preview');
+
+    if (editToggle && editForm) {
+      editToggle.addEventListener('click', () => {
+        // prefill
+        nameField.value = authState.user.name || '';
+        bioField.value = authState.user.bio || '';
+        expField.value = authState.user.experience || '';
+        expertiseField.value = authState.user.expertise || '';
+        cityField.value = authState.user.city || '';
+        if (authState.user.avatar) {
+          avatarPreview.src = authState.user.avatar;
+          avatarPreview.style.display = 'block';
+        } else {
+          avatarPreview.style.display = 'none';
+        }
+        editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+      });
+    }
+
+    if (cancelBtn) cancelBtn.addEventListener('click', () => { editForm.style.display = 'none'; });
+
+    let avatarData = null;
+    if (avatarField) {
+      avatarField.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          avatarData = reader.result;
+          avatarPreview.src = avatarData;
+          avatarPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (editForm) {
+      editForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+          action: 'update',
+          id: authState.user.id,
+          name: nameField.value || authState.user.name,
+          bio: bioField.value || null,
+          experience: expField.value ? Number(expField.value) : 0,
+          expertise: expertiseField.value || null,
+          city: cityField.value || null,
+        };
+        if (avatarData) payload.avatar = avatarData;
+        const resp = await fetch(`${apiBase}/api/auth`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
+        const result = await resp.json().catch(() => ({}));
+        if (resp.ok) {
+          localStorage.setItem('mindconnect-auth', JSON.stringify(result));
+          alert('Профайл шинэчлэгдлээ');
+          // update UI
+          const newState = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+          authState.user = newState.user; // update local variable
+          dashboardHeading.textContent = `Тавтай морил, ${authState.user.name}`;
+          if (profileEl) {
+            profileEl.querySelector('div').innerHTML = `
+              <div style="font-weight:600">${authState.user.name || '—'}</div>
+              <div style="color:var(--muted);margin-top:0.25rem">${authState.user.profession || authState.user.expertise || ''}</div>
+              <div style="margin-top:0.5rem;color:var(--muted)">Туршлага: ${authState.user.experience || 0} жил · Хот: ${authState.user.city || '—'}</div>
+              <div style="margin-top:0.5rem;max-width:50ch">${authState.user.bio || ''}</div>
+            `;
+          }
+          editForm.style.display = 'none';
+        } else {
+          alert(result.error || 'Профайл шинэчлэхэд алдаа гарлаа');
+        }
+      });
+    }
+
     const bookingsContainer = document.getElementById('booking-list');
     const bookingTemplate = (booking) => `
       <article class="booking-item">
