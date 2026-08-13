@@ -35,14 +35,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (state?.user && nav) {
       const counselorLink = nav.querySelector('.nav-counselor-dashboard');
-      if (state.user.role === 'counselor' && !counselorLink) {
+      // show counselor dashboard link for users with counselor role or an associated psychologistId
+      if ((state.user.role === 'counselor' || state.user.psychologistId) && !counselorLink) {
         const dashboardLink = document.createElement('a');
         dashboardLink.href = `${pagePrefix}counselor-dashboard.html`;
         dashboardLink.className = 'nav-counselor-dashboard';
         dashboardLink.textContent = 'Зөвлөх самбар';
         nav.insertBefore(dashboardLink, nav.querySelector('.nav-cta'));
       }
-      if (state.user.role !== 'counselor' && counselorLink) {
+      if (state.user.role !== 'counselor' && !state.user.psychologistId && counselorLink) {
         counselorLink.remove();
       }
     }
@@ -408,7 +409,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const counselorDashboard = document.getElementById('counselor-dashboard');
   if (counselorDashboard) {
     const authState = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
-    if (!authState?.user || authState.user.role !== 'counselor') {
+    if (!authState?.user || (authState.user.role !== 'counselor' && !authState.user.psychologistId)) {
       counselorDashboard.innerHTML = '<p>Та зөвлөхийн эрхгүй байна. Нэвтрэх эсвэл зөвлөмж залгаарай.</p>';
       return;
     }
