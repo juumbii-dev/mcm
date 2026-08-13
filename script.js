@@ -428,11 +428,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       const infoHtml = `
         <div style="display:flex;gap:1rem;align-items:flex-start">
           ${avatarHtml}
-          <div>
-            <div style="font-weight:600">${authState.user.name || '—'}</div>
+          <div style="min-width:0">
+            <div style="font-weight:700;font-size:1.1rem">${authState.user.name || '—'}</div>
             <div style="color:var(--muted);margin-top:0.25rem">${authState.user.profession || authState.user.expertise || ''}</div>
-            <div style="margin-top:0.5rem;color:var(--muted)">Туршлага: ${authState.user.experience || 0} жил · Хот: ${authState.user.city || '—'}</div>
-            <div style="margin-top:0.5rem;max-width:50ch">${authState.user.bio || ''}</div>
+            <div style="margin-top:0.5rem;color:var(--muted)">Email: ${authState.user.email || '—'}</div>
+            <div style="margin-top:0.25rem;color:var(--muted)">Туршлага: ${authState.user.experience || 0} жил · Хот: ${authState.user.city || '—'}</div>
+            <div style="margin-top:0.25rem;color:var(--muted)">Мэргэжил: ${authState.user.expertise || '—'}</div>
+            <div style="margin-top:0.25rem;color:var(--muted)">Мэргэшсэн чиглэл / Сонголтууд: ${authState.user.qualifications || '—'}</div>
+            <div style="margin-top:0.25rem;color:var(--muted)">Нас: ${authState.user.age || '—'} · Хүйс: ${authState.user.gender || '—'} · Гэр бүлийн байдал: ${authState.user.maritalStatus || authState.user.marital_status || '—'}</div>
+            <div style="margin-top:0.5rem;max-width:64ch">${authState.user.bio || ''}</div>
+            <div style="margin-top:0.5rem;color:var(--muted)"><strong>Сонирхол:</strong> ${authState.user.interests || '—'}</div>
+            <div style="margin-top:0.25rem;color:var(--muted)"><strong>Сэтгэл зүйн асуудлын төрөл:</strong> ${authState.user.issues || '—'}</div>
           </div>
         </div>
       `;
