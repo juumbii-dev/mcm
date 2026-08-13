@@ -58,6 +58,26 @@
           <div id="client-fields" style="display:none;">
             <label>Хот <input type="text" name="city" id="profile-city" /></label>
             <label>Нас <input type="number" name="age" id="profile-age" min="0" /></label>
+            <label>Хүйс
+              <select name="gender" id="profile-gender">
+                <option value="">Сонго</option>
+                <option value="male">Эр</option>
+                <option value="female">Эм</option>
+                <option value="other">Бусад</option>
+              </select>
+            </label>
+            <label>Мэргэжил <input type="text" name="profession" id="profile-profession" /></label>
+            <label>Гэр бүлийн байдал
+              <select name="marital_status" id="profile-marital_status">
+                <option value="">Сонго</option>
+                <option value="single">Ганц бие</option>
+                <option value="married">Гэрлэсэн</option>
+                <option value="divorced">Салсан</option>
+                <option value="other">Бусад</option>
+              </select>
+            </label>
+            <label>Сонирхол<textarea name="interests" id="profile-interests" rows="3"></textarea></label>
+            <label>Сэтгэл зүйн асуудлын төрөл<textarea name="issues" id="profile-issues" rows="3" placeholder="(жишээ: стресс, anxiety, харилцаа ...)"></textarea></label>
           </div>
           <button class="btn btn-primary" type="submit">Мэдээлэл хадгалах</button>
         </form>

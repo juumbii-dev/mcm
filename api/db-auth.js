@@ -11,7 +11,7 @@ async function handleAuth(req, res) {
       const data = JSON.parse(body);
       console.log('AUTH_PAYLOAD', data && data.action);
       if (data.action === 'register') {
-        const { name, email, phone, password, role, psychologistId, bio, experience, expertise, qualifications, city, age, avatar } = data;
+        const { name, email, phone, password, role, psychologistId, bio, experience, expertise, qualifications, city, age, avatar, gender, profession, marital_status, interests, issues } = data;
         if (!name || !email || !password) {
           res.statusCode = 400;
           res.end(JSON.stringify({ error: 'Name, email and password are required' }));
@@ -39,6 +39,11 @@ async function handleAuth(req, res) {
           qualifications: qualifications || null,
           city: city || null,
           age: age || null,
+          gender: gender || null,
+          profession: profession || null,
+          marital_status: marital_status || null,
+          interests: interests || null,
+          issues: issues || null,
           passwordHash: hashPassword(password),
         });
 
@@ -62,7 +67,7 @@ async function handleAuth(req, res) {
       }
 
       if (data.action === 'update') {
-        const { id, name, email, phone, role, psychologistId, password, bio, experience, expertise, qualifications, city, age, avatar } = data;
+        const { id, name, email, phone, role, psychologistId, password, bio, experience, expertise, qualifications, city, age, avatar, gender, profession, marital_status, interests, issues } = data;
         if (!id) {
           res.statusCode = 400;
           res.end(JSON.stringify({ error: 'User id required' }));
@@ -74,6 +79,11 @@ async function handleAuth(req, res) {
         if (phone !== undefined) update.phone = phone;
         if (bio !== undefined) update.bio = bio;
         if (avatar !== undefined) update.avatar = avatar;
+        if (gender !== undefined) update.gender = gender;
+        if (profession !== undefined) update.profession = profession;
+        if (marital_status !== undefined) update.marital_status = marital_status;
+        if (interests !== undefined) update.interests = interests;
+        if (issues !== undefined) update.issues = issues;
         if (experience !== undefined) update.experience = experience;
         if (expertise !== undefined) update.expertise = expertise;
         if (qualifications !== undefined) update.qualifications = qualifications;

@@ -523,6 +523,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const qualificationsInput = document.getElementById('profile-qualifications');
     const cityInput = document.getElementById('profile-city');
     const ageInput = document.getElementById('profile-age');
+    const genderSelect = document.getElementById('profile-gender');
+    const professionInput = document.getElementById('profile-profession');
+    const maritalSelect = document.getElementById('profile-marital_status');
+    const interestsInput = document.getElementById('profile-interests');
+    const issuesInput = document.getElementById('profile-issues');
     const bookingsEl = document.getElementById('profile-bookings');
 
     nameInput.value = state.user.name || '';
@@ -545,11 +550,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       experienceInput.value = state.user.experience || '';
       expertiseInput.value = state.user.expertise || '';
       qualificationsInput.value = state.user.qualifications || '';
-    } else {
+      } else {
       clientFields.style.display = 'block';
       counselorFields.style.display = 'none';
       cityInput.value = state.user.city || '';
       ageInput.value = state.user.age || '';
+      genderSelect.value = state.user.gender || '';
+      professionInput.value = state.user.profession || '';
+      maritalSelect.value = state.user.maritalStatus || state.user.marital_status || '';
+      interestsInput.value = state.user.interests || '';
+      issuesInput.value = state.user.issues || '';
     }
 
     let avatarDataUrl = null;
@@ -699,6 +709,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         payload.city = cityInput.value || null;
         payload.age = ageInput.value ? Number(ageInput.value) : null;
+        payload.gender = genderSelect.value || null;
+        payload.profession = professionInput.value || null;
+        payload.marital_status = maritalSelect.value || null;
+        payload.interests = interestsInput.value || null;
+        payload.issues = issuesInput.value || null;
       }
 
       const res = await fetch(`${apiBase}/api/auth`, {
