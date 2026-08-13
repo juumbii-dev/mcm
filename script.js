@@ -420,6 +420,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     ));
     if (heroCopy && isCounselorLike) {
       const u = authState.user;
+      // hide the right-side hero visual (development/progress image) when showing counselor profile
+      const heroVisual = document.querySelector('.hero-visual');
+      if (heroVisual) heroVisual.style.display = 'none';
       const heroAvatar = u.avatar
         ? `<img src="${u.avatar}" alt="avatar" style="width:120px;height:120px;object-fit:cover;border-radius:12px;"/>`
         : `<div style="width:120px;height:120px;border-radius:12px;background:var(--muted);color:white;display:flex;align-items:center;justify-content:center;font-size:40px">${(u.name||'')[0]||''}</div>`;
