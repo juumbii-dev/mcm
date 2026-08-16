@@ -1,0 +1,9 @@
+{
+  "token": "token-client",
+  "user": {
+    "email": "client@example.com",
+    "id": 99,
+    "role": "client",
+    "name": "Client User"
+  }
+}

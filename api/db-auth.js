@@ -1,5 +1,7 @@
 const { initDatabase, hashPassword, findUserByEmail, createUser, findUserByCredentials, updateUser } = require('../lib/db');
 
+const { findUserById } = require('../lib/db');
+
 async function handleAuth(req, res) {
   await initDatabase();
   let body = '';
@@ -8,6 +10,27 @@ async function handleAuth(req, res) {
   });
   req.on('end', async () => {
     try {
+      // If GET request (no body), allow retrieving authenticated user's latest data
+      if (req.method === 'GET') {
+        const authHeader = req.headers && (req.headers.authorization || req.headers.Authorization) || '';
+        const tokenMatch = (authHeader || '').toString().match(/^Bearer\s+token-(\d+)$/);
+        if (!tokenMatch) {
+          res.statusCode = 401;
+          res.end(JSON.stringify({ error: 'Unauthorized: missing or invalid token' }));
+          return;
+        }
+        const userId = Number(tokenMatch[1]);
+        const user = await findUserById(userId);
+        if (!user) {
+          res.statusCode = 404;
+          res.end(JSON.stringify({ error: 'User not found' }));
+          return;
+        }
+        res.statusCode = 200;
+        res.end(JSON.stringify({ user, token: `token-${user.id}` }));
+        return;
+      }
+
       const data = JSON.parse(body);
       console.log('AUTH_PAYLOAD', data && data.action);
       if (data.action === 'register') {

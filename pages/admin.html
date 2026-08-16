@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | MindConnect Mongolia</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark">M</span>
+          <span>MindConnect Mongolia</span>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="site-nav">
+          <a href="../index.html">Нүүр хуудас</a>
+          <a href="psychologists.html">Зөвлөхүүд</a>
+          <a href="profile.html" class="nav-counselor-dashboard" style="display:none;">Зөвлөхийн профайл</a>
+          <a href="admin.html" class="nav-admin">Admin</a>
+          <a href="login.html" class="nav-cta">Нэвтрэх</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 3rem 0;">
+      <section class="form-card" id="admin-page">
+        <p class="eyebrow">Admin</p>
+        <h1 class="page-title">Хэрэглэгчийн удирдлага</h1>
+        <p class="page-subtitle">Зөвлөх болон үйлчлүүлэгчийн account-ийг тусад нь удирдах боломжтой.</p>
+
+        <div style="display:grid; gap:1.5rem; margin-top:1.5rem;">
+          <div>
+            <h2 style="margin-bottom: 0.75rem;">Зөвлөхүүд</h2>
+            <table style="width:100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="text-align:left; padding:0.5rem;">Нэр</th>
+                  <th style="text-align:left; padding:0.5rem;">Имэйл</th>
+                  <th style="text-align:left; padding:0.5rem;">Төлөв</th>
+                  <th style="text-align:left; padding:0.5rem;">Үйлдэл</th>
+                </tr>
+              </thead>
+              <tbody id="admin-counselor-list"></tbody>
+            </table>
+          </div>
+
+          <div>
+            <h2 style="margin-bottom: 0.75rem;">Үйлчлүүлэгчид</h2>
+            <table style="width:100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="text-align:left; padding:0.5rem;">Нэр</th>
+                  <th style="text-align:left; padding:0.5rem;">Имэйл</th>
+                  <th style="text-align:left; padding:0.5rem;">Төлөв</th>
+                  <th style="text-align:left; padding:0.5rem;">Үйлдэл</th>
+                </tr>
+              </thead>
+              <tbody id="admin-client-list"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="../script.js"></script>
+  </body>
+</html>

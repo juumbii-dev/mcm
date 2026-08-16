@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { initDatabase } = require('./lib/db');
 const handleAuth = require('./api/db-auth');
+const handleAdmin = require('./api/db-admin');
 const handleBookings = require('./api/db-bookings');
 const handlePsychologists = require('./api/db-psychologists');
 
@@ -44,6 +45,11 @@ const server = http.createServer(async (req, res) => {
 
   if (url.pathname === '/api/auth') {
     await handleAuth(req, res);
+    return;
+  }
+
+  if (url.pathname === '/api/admin/users') {
+    await handleAdmin(req, res);
     return;
   }
 

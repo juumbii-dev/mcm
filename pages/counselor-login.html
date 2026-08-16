@@ -29,30 +29,52 @@
     <main class="container" style="padding: 3rem 0;">
       <section class="form-card">
         <p class="eyebrow">Зөвлөх бүртгэл</p>
-        <h1 class="page-title">Зөвлөх болгон бүртгүүлэх</h1>
           <p class="page-subtitle">Имэйл болон нууц үгээ оруулж бүртгүүлнэ үү.</p>
 
         <form id="register-form">
-          <!-- server requires `name`, so provide default counselor name -->
-          <input type="hidden" name="name" value="Зөвлөх" />
           <input type="hidden" name="role" value="counselor" />
           <label>
-            Зөвлөхийн профайл
-            <select name="psychologistId" required>
-              <option value="">Зөвлөх сонго</option>
-              <option value="1">А. Мягмар</option>
-              <option value="2">Б. Нандин</option>
-              <option value="3">Г. Төгс</option>
-            </select>
+            Нэр
+            <input type="text" name="name" placeholder="Таны нэр" required />
           </label>
-          <input type="email" name="email" placeholder="Имэйл" required />
-          <input type="password" name="password" placeholder="Нууц үг" required />
+          <label>
+            Имэйл
+            <input type="email" name="email" placeholder="Имэйл" required />
+          </label>
+          <label>
+            Утас
+            <input type="tel" name="phone" placeholder="Утас" />
+          </label>
+          <label>
+            Товч танилцуулга
+            <textarea name="bio" rows="3" placeholder="Танилцуулга"></textarea>
+          </label>
+          <label>
+            Туршлага (жил)
+            <input type="number" name="experience" min="0" value="0" />
+          </label>
+          <label>
+            Мэргэжил / Салбар
+            <input type="text" name="expertise" placeholder="Жишээ: Сэтгэл зүй, гэр бүлийн зөвлөгөө" />
+          </label>
+          <label>
+            Хот
+            <input type="text" name="city" placeholder="Хот" />
+          </label>
+          <label>
+            Гэрчилгээ / Төгсөлт
+            <input type="text" name="qualifications" placeholder="Диплом, сертификат" />
+          </label>
+          <label>
+            Нууц үг
+            <input type="password" name="password" placeholder="Нууц үг" required />
+          </label>
           <button class="btn btn-primary" type="submit">Бүртгүүлэх</button>
         </form>
 
         <hr style="margin: 1.5rem 0;" />
 
-        <p class="eyebrow">Зөвлөх нэвтрэх</p>
+        <p class="eyebrow">Зөвлөхөөр бүртгүүлэх</p>
         <form id="login-form">
           <input type="email" name="email" placeholder="Имэйл" required />
           <input type="password" name="password" placeholder="Нууц үг" required />

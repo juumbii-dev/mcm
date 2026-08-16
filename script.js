@@ -10,13 +10,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const pagePrefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
 
-  // Insert counselor login link before the first nav item (if not already present)
+  // Insert admin and counselor links in nav (if not already present)
+  if (nav && !nav.querySelector('.nav-admin')) {
+    const firstLink = nav.querySelector('a');
+    const adminLink = document.createElement('a');
+    adminLink.href = `${pagePrefix}admin.html`;
+    adminLink.className = 'nav-admin';
+    adminLink.textContent = 'Admin';
+    if (firstLink) nav.insertBefore(adminLink, firstLink);
+    else nav.appendChild(adminLink);
+  }
+
   if (nav && !nav.querySelector('.nav-counselor')) {
     const firstLink = nav.querySelector('a');
     const counselorLink = document.createElement('a');
     counselorLink.href = `${pagePrefix}counselor-login.html`;
     counselorLink.className = 'nav-counselor';
-    counselorLink.textContent = 'Зөвлөх нэвтрэх';
+    counselorLink.textContent = 'Зөвлөхөөр бүртгүүлэх';
     if (firstLink) nav.insertBefore(counselorLink, firstLink);
     else nav.appendChild(counselorLink);
   }
@@ -25,26 +35,68 @@ document.addEventListener('DOMContentLoaded', async () => {
   const apiBase = (window.location.origin === 'null' || window.location.origin === 'file:')
     ? 'http://localhost:8000'
     : window.location.origin;
-  const authState = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+  const getStoredAuth = () => {
+    try {
+      return JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+    } catch (e) {
+      return null;
+    }
+  };
+  const isCounselorSession = () => {
+    const state = getStoredAuth();
+    return !!(state?.user && (state.user.role === 'counselor' || state.user.psychologistId));
+  };
+  const notifyAuthUpdated = () => {
+    window.dispatchEvent(new CustomEvent('mindconnect-auth-updated'));
+  };
+  const authState = getStoredAuth();
   const isLoggedIn = !!(authState && authState.user);
+  const isAdminUser = () => !!(getStoredAuth()?.user && getStoredAuth().user.isAdmin);
+
+  if (window.location.pathname.endsWith('/counselor-login.html') || window.location.pathname.endsWith('counselor-login.html')) {
+    if (isCounselorSession()) {
+      window.location.replace(`${pagePrefix}profile.html`);
+      return;
+    }
+  }
 
   const renderAuthState = () => {
-    const state = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+    const state = getStoredAuth();
     const loginHref = window.location.pathname.includes('/pages/') ? 'login.html' : 'pages/login.html';
     const nav = document.querySelector('.site-nav');
 
-    if (state?.user && nav) {
-      const counselorLink = nav.querySelector('.nav-counselor-dashboard');
-      // show counselor dashboard link for users with counselor role or an associated psychologistId
-      if ((state.user.role === 'counselor' || state.user.psychologistId) && !counselorLink) {
-        const dashboardLink = document.createElement('a');
-        dashboardLink.href = `${pagePrefix}counselor-dashboard.html`;
-        dashboardLink.className = 'nav-counselor-dashboard';
-        dashboardLink.textContent = 'Зөвлөх самбар';
-        nav.insertBefore(dashboardLink, nav.querySelector('.nav-cta'));
+    if (nav) {
+      const counselorEntry = nav.querySelector('.nav-counselor');
+      if (state?.user) {
+        if (counselorEntry) counselorEntry.style.display = 'none';
+      } else if (counselorEntry) {
+        counselorEntry.style.display = '';
       }
-      if (state.user.role !== 'counselor' && !state.user.psychologistId && counselorLink) {
-        counselorLink.remove();
+    }
+
+    if (nav) {
+      const counselorMenu = nav.querySelector('.nav-counselor');
+      const publicCounselorsMenu = Array.from(nav.querySelectorAll('a')).find((a) => a.textContent && a.textContent.trim() === 'Зөвлөхүүд');
+      const counselorProfileMenu = nav.querySelector('.nav-counselor-dashboard');
+      const adminMenu = nav.querySelector('.nav-admin');
+
+      if (adminMenu) {
+        adminMenu.style.display = '';
+      }
+
+      if (publicCounselorsMenu) {
+        const hideCounselorMenu = !!(state?.user && (state.user.role === 'counselor' || state.user.psychologistId));
+        publicCounselorsMenu.style.display = hideCounselorMenu ? 'none' : '';
+      }
+
+      if (counselorProfileMenu) {
+        const shouldShow = !!(state?.user && !(state.user.role === 'counselor' || state.user.psychologistId));
+        counselorProfileMenu.style.display = shouldShow ? '' : 'none';
+      }
+
+      if (counselorMenu) {
+        const hideRegisterEntry = !!state?.user;
+        counselorMenu.style.display = hideRegisterEntry ? 'none' : '';
       }
     }
 
@@ -72,6 +124,37 @@ document.addEventListener('DOMContentLoaded', async () => {
       authLink.classList.add('login-link');
       authLink.href = loginHref;
     }
+
+    // Hide parent page sections (hero, filters) and the 'Нүүр хуудас' link when a counselor is logged in
+    try {
+      const hero = document.querySelector('.page-hero');
+      const filters = document.querySelector('.filter-bar');
+      const homeLinks = Array.from(document.querySelectorAll('a[href$="index.html"], a[href$="/index.html"], a[href$="../index.html"]'));
+      const shouldHideParent = !!(state?.user && state.user.role === 'counselor');
+
+      [hero, filters].forEach((el) => {
+        if (!el) return;
+        if (shouldHideParent) {
+          if (el._origDisplay === undefined) el._origDisplay = el.style.display || '';
+          el.style.display = 'none';
+        } else {
+          if (el._origDisplay !== undefined) el.style.display = el._origDisplay;
+          else el.style.display = '';
+        }
+      });
+
+      homeLinks.forEach((a) => {
+        if (shouldHideParent) {
+          if (a._origDisplay === undefined) a._origDisplay = a.style.display || '';
+          a.style.display = 'none';
+        } else {
+          if (a._origDisplay !== undefined) a.style.display = a._origDisplay;
+          else a.style.display = '';
+        }
+      });
+    } catch (e) {
+      console.error('renderAuthState parent-hide error', e);
+    }
   };
 
   renderAuthState();
@@ -84,6 +167,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.location.reload();
     }
   });
+
+  const redirectAfterAuth = (result) => {
+    const user = result && result.user ? result.user : null;
+    const isCounselorLogin = !!(user && (user.role === 'counselor' || user.psychologistId));
+    const target = isCounselorLogin
+      ? (window.location.pathname.includes('/pages/') ? 'profile.html' : 'pages/profile.html')
+      : '/index.html';
+    window.location.href = target;
+  };
 
   const registerForm = document.getElementById('register-form');
   if (registerForm) {
@@ -98,6 +190,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         password: formData.get('password'),
         role: formData.get('role') || 'client',
         psychologistId: formData.get('psychologistId') ? Number(formData.get('psychologistId')) : null,
+        bio: formData.get('bio') || null,
+        experience: formData.get('experience') !== undefined && formData.get('experience') !== null && formData.get('experience') !== '' ? Number(formData.get('experience')) : 0,
+        expertise: formData.get('expertise') || null,
+        city: formData.get('city') || null,
+        qualifications: formData.get('qualifications') || null,
       };
 
       const response = await fetch(`${apiBase}/api/auth`, {
@@ -108,7 +205,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await response.json();
       if (response.ok) {
         localStorage.setItem('mindconnect-auth', JSON.stringify(result));
-        window.location.href = '/index.html';
+        notifyAuthUpdated();
+        redirectAfterAuth(result);
       } else {
         alert(result.error || 'Бүртгэл амжилтгүй боллоо');
       }
@@ -134,7 +232,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await response.json();
       if (response.ok) {
         localStorage.setItem('mindconnect-auth', JSON.stringify(result));
-        window.location.href = '/index.html';
+        notifyAuthUpdated();
+        redirectAfterAuth(result);
       } else {
         alert(result.error || 'Нэвтрэлт амжилтгүй боллоо');
       }
@@ -145,11 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (psychologistList) {
     const response = await fetch(`${apiBase}/api/psychologists`);
     const psychologists = await response.json();
-    let visiblePsychologists = psychologists;
-
-    if (authState?.user?.role === 'counselor' && authState.user.psychologistId) {
-      visiblePsychologists = psychologists.filter((psychologist) => psychologist.id === authState.user.psychologistId);
-    }
+    const visiblePsychologists = psychologists;
 
     psychologistList.innerHTML = visiblePsychologists.length
       ? visiblePsychologists.map((psychologist) => `
@@ -406,26 +501,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await updateHomeAppointment();
 
-  // If on homepage, replace hero copy with counselor profile when a counselor is logged in
-  try {
-    const heroCopy = document.querySelector('.hero-copy');
-    const stored = localStorage.getItem('mindconnect-auth');
-    console.debug('hero: authState', authState, 'localStorage.mindconnect-auth present?', !!stored);
-    // Broaden condition: show profile when user appears to have counselor-like fields
-    const isCounselorLike = !!(authState?.user && (
-      authState.user.role === 'counselor' ||
-      authState.user.psychologistId ||
-      authState.user.expertise ||
-      authState.user.qualifications
-    ));
-    if (heroCopy && isCounselorLike) {
-      const u = authState.user;
-      // hide the right-side hero visual (development/progress image) when showing counselor profile
+  // Hero renderer: show counselor profile in homepage hero when logged-in counselor-like user
+  const renderHeroForCounselor = () => {
+    try {
+      const heroCopy = document.querySelector('.hero-copy');
       const heroVisual = document.querySelector('.hero-visual');
-      if (heroVisual) heroVisual.style.display = 'none';
-      const heroAvatar = u.avatar
+      if (!heroCopy) return;
+
+      // cache original html on first run
+      if (!heroCopy._originalHtml) heroCopy._originalHtml = heroCopy.innerHTML;
+      if (heroVisual && heroVisual._originalDisplay === undefined) heroVisual._originalDisplay = heroVisual.style.display || '';
+
+      const stored = getStoredAuth();
+      const u = stored && stored.user ? stored.user : null;
+      const isCounselorLike = !!(u && (u.role === 'counselor' || u.psychologistId || u.expertise || u.qualifications));
+
+      if (!isCounselorLike) {
+        // restore original hero
+        if (heroCopy._originalHtml) heroCopy.innerHTML = heroCopy._originalHtml;
+        if (heroVisual) heroVisual.style.display = heroVisual._originalDisplay;
+        return;
+      }
+
+      // build avatar
+      const heroAvatar = u && u.avatar
         ? `<img src="${u.avatar}" alt="avatar" style="width:120px;height:120px;object-fit:cover;border-radius:12px;"/>`
-        : `<div style="width:120px;height:120px;border-radius:12px;background:var(--muted);color:white;display:flex;align-items:center;justify-content:center;font-size:40px">${(u.name||'')[0]||''}</div>`;
+        : `<div style="width:120px;height:120px;border-radius:12px;background:var(--muted);color:white;display:flex;align-items:center;justify-content:center;font-size:40px">${(u && u.name||'')[0]||''}</div>`;
 
       heroCopy.innerHTML = `
         <div class="hero-badges">
@@ -445,9 +546,197 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
       `;
+
+      if (heroVisual) heroVisual.style.display = 'none';
+    } catch (e) {
+      console.error('renderHeroForCounselor error', e);
     }
-  } catch (e) {
-    console.error('Hero replace error', e);
+  };
+
+  // initial render and listen for storage changes (other tabs)
+  renderHeroForCounselor();
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'mindconnect-auth') renderHeroForCounselor();
+  });
+  window.addEventListener('mindconnect-auth-updated', () => {
+    renderAuthState();
+    renderHeroForCounselor();
+  });
+
+  // Refresh commonly updated UI parts after auth/profile changes
+  const refreshAllViews = async () => {
+    try {
+      // If we have a token, ask server for the canonical user object to pick up server-side changes
+      const stored = getStoredAuth();
+      if (stored && stored.token) {
+        try {
+          const meResp = await fetch(`${apiBase}/api/auth`, { headers: { Authorization: `Bearer ${stored.token}` } });
+          if (meResp.ok) {
+            const meJson = await meResp.json().catch(() => ({}));
+            if (meJson && meJson.user) {
+              localStorage.setItem('mindconnect-auth', JSON.stringify({ user: meJson.user, token: stored.token }));
+            }
+          }
+        } catch (e) { /* ignore network errors */ }
+      }
+    } catch (e) { /* ignore */ }
+    try { renderAuthState(); } catch (e) { /* ignore */ }
+    try { renderHeroForCounselor(); } catch (e) { /* ignore */ }
+    try { await updateHomeAppointment(); } catch (e) { /* ignore */ }
+    try {
+      const pl = document.getElementById('psychologist-list');
+      if (pl) {
+        const res = await fetch(`${apiBase}/api/psychologists`);
+        const psychologists = await res.json();
+        const latest = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+        const visiblePsychologists = psychologists;
+        pl.innerHTML = visiblePsychologists.length
+          ? visiblePsychologists.map((psychologist) => `
+              <article class="psych-card">
+                <div class="avatar">${psychologist.name.charAt(0)}</div>
+                <h3>${psychologist.name}</h3>
+                <p>${psychologist.specialty} · ${psychologist.focus}</p>
+                <div class="meta-row">
+                  <span>⭐ ${psychologist.rating.toFixed(1)}</span>
+                  <span>₮${psychologist.price.toLocaleString()}</span>
+                </div>
+                <a href="pages/psychologist.html?id=${psychologist.id}" class="text-link">Дэлгэрэнгүй</a>
+              </article>
+            `).join('')
+          : '<p style="color: var(--muted);">Одоогоор зөвлөхийн мэдээлэл байхгүй байна.</p>';
+      }
+    } catch (e) { /* ignore */ }
+  };
+
+  // Poll server periodically to pick up any server-side profile changes
+  try {
+    setInterval(() => {
+      const stored = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+      if (stored && stored.token) {
+        refreshAllViews().catch(() => {});
+      }
+    }, 15000);
+  } catch (e) { /* ignore */ }
+
+  const adminPage = document.getElementById('admin-page');
+  if (adminPage) {
+    const stored = getStoredAuth();
+    if (!stored?.user || !stored.user.isAdmin) {
+      window.location.href = `${pagePrefix}login.html`;
+      return;
+    }
+
+    const counselorTable = document.getElementById('admin-counselor-list');
+    const clientTable = document.getElementById('admin-client-list');
+
+    const renderUserRow = (user) => `
+      <tr>
+        <td><input type="text" data-name-field="${user.id}" value="${(user.name || '').replace(/"/g, '&quot;')}" /></td>
+        <td><input type="email" data-email-field="${user.id}" value="${(user.email || '').replace(/"/g, '&quot;')}" /></td>
+        <td>
+          <label style="display:flex;align-items:center;gap:0.5rem;">
+            <input type="checkbox" data-active-field="${user.id}" ${user.isActive ? 'checked' : ''} />
+            ${user.isActive ? 'Идэвхтэй' : 'Идэвхгүй'}
+          </label>
+        </td>
+        <td>
+          <button class="btn btn-secondary admin-save" data-user-id="${user.id}">Хадгалах</button>
+          <button class="btn btn-danger admin-toggle" data-user-id="${user.id}" data-state="${user.isActive ? 'disable' : 'enable'}">${user.isActive ? 'Идэвхгүй болгох' : 'Идэвхжүүлэх'}</button>
+          <button class="btn btn-danger admin-delete" data-user-id="${user.id}">Устгах</button>
+        </td>
+      </tr>
+    `;
+
+    const loadAdminUsers = async () => {
+      const response = await fetch(`${apiBase}/api/admin/users`, {
+        headers: { Authorization: `Bearer ${stored.token}` },
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        counselorTable.innerHTML = `<tr><td colspan="4"><p>Ошибка: ${result.error || 'Не удалось загрузить пользователей'}</p></td></tr>`;
+        clientTable.innerHTML = `<tr><td colspan="4"><p>Ошибка: ${result.error || 'Не удалось загрузить пользователей'}</p></td></tr>`;
+        return;
+      }
+
+      const users = (result.users || []).filter((user) => user.role !== 'admin');
+      const counselors = users.filter((user) => user.role === 'counselor');
+      const clients = users.filter((user) => user.role === 'client');
+
+      counselorTable.innerHTML = counselors.length
+        ? counselors.map(renderUserRow).join('')
+        : '<tr><td colspan="4">Зөвлөх байхгүй байна.</td></tr>';
+      clientTable.innerHTML = clients.length
+        ? clients.map(renderUserRow).join('')
+        : '<tr><td colspan="4">Үйлчлүүлэгч байхгүй байна.</td></tr>';
+
+      document.querySelectorAll('.admin-save').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const userId = Number(button.dataset.userId);
+          const nameField = document.querySelector(`input[data-name-field="${userId}"]`);
+          const emailField = document.querySelector(`input[data-email-field="${userId}"]`);
+          const isActiveField = document.querySelector(`input[data-active-field="${userId}"]`);
+          const payload = {
+            id: userId,
+            name: nameField ? nameField.value : '',
+            email: emailField ? emailField.value : '',
+            isActive: !!(isActiveField && isActiveField.checked),
+          };
+          const response = await fetch(`${apiBase}/api/admin/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${stored.token}` },
+            body: JSON.stringify(payload),
+          });
+          const result = await response.json().catch(() => ({}));
+          if (response.ok) {
+            alert('Мэдээлэл шинэчлэгдлээ.');
+            await loadAdminUsers();
+          } else {
+            alert(result.error || 'Шинэчлэх үед алдаа гарлаа');
+          }
+        });
+      });
+
+      document.querySelectorAll('.admin-toggle').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const userId = Number(button.dataset.userId);
+          const nextState = button.dataset.state === 'enable';
+          const response = await fetch(`${apiBase}/api/admin/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${stored.token}` },
+            body: JSON.stringify({ id: userId, isActive: nextState }),
+          });
+          const result = await response.json().catch(() => ({}));
+          if (response.ok) {
+            await loadAdminUsers();
+          } else {
+            alert(result.error || 'Төлөв өөрчлөх үед алдаа гарлаа');
+          }
+        });
+      });
+
+      document.querySelectorAll('.admin-delete').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const userId = Number(button.dataset.userId);
+          const shouldDelete = window.confirm('Энэ хэрэглэгчийг устгах уу?');
+          if (!shouldDelete) return;
+
+          const response = await fetch(`${apiBase}/api/admin/users`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${stored.token}` },
+            body: JSON.stringify({ id: userId }),
+          });
+          const result = await response.json().catch(() => ({}));
+          if (response.ok) {
+            alert('Хэрэглэгчийг устгалаа.');
+            await loadAdminUsers();
+          } else {
+            alert(result.error || 'Устгах үед алдаа гарлаа');
+          }
+        });
+      });
+    };
+
+    loadAdminUsers();
   }
 
   const counselorDashboard = document.getElementById('counselor-dashboard');
@@ -559,9 +848,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const result = await resp.json().catch(() => ({}));
         if (resp.ok) {
           localStorage.setItem('mindconnect-auth', JSON.stringify(result));
+          notifyAuthUpdated();
           alert('Профайл шинэчлэгдлээ');
           // update UI
-          const newState = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+          const newState = getStoredAuth();
           authState.user = newState.user; // update local variable
           dashboardHeading.textContent = `Тавтай морил, ${authState.user.name}`;
           if (profileEl) {
@@ -573,6 +863,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
           }
           editForm.style.display = 'none';
+          // refresh common UI areas (hero, nav, appointments, lists)
+          try { await refreshAllViews(); } catch (e) { /* ignore */ }
         } else {
           alert(result.error || 'Профайл шинэчлэхэд алдаа гарлаа');
         }
@@ -664,7 +956,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const profilePage = document.getElementById('profile-page');
   if (profilePage) {
-    const state = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
+    const state = getStoredAuth();
     if (!state?.user) {
       window.location.href = `${pagePrefix}login.html`;
       return;
@@ -693,37 +985,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     const issuesInput = document.getElementById('profile-issues');
     const bookingsEl = document.getElementById('profile-bookings');
 
-    nameInput.value = state.user.name || '';
-    emailInput.value = state.user.email || '';
-    phoneInput.value = state.user.phone || '';
-    bioInput.value = state.user.bio || '';
-    // avatar preview
-    if (avatarPreview) {
-      if (state.user.avatar) {
-        avatarPreview.src = state.user.avatar;
-        avatarPreview.style.display = 'block';
-      } else {
-        avatarPreview.style.display = 'none';
+    const hydrateProfileForm = (user) => {
+      if (!user) return;
+      nameInput.value = user.name || '';
+      emailInput.value = user.email || '';
+      phoneInput.value = user.phone || '';
+      bioInput.value = user.bio || '';
+      if (avatarPreview) {
+        if (user.avatar) {
+          avatarPreview.src = user.avatar;
+          avatarPreview.style.display = 'block';
+        } else {
+          avatarPreview.style.display = 'none';
+        }
       }
-    }
-    if (state.user.role === 'counselor') {
-      counselorFields.style.display = 'block';
-      clientFields.style.display = 'none';
-      if (state.user.psychologistId) psychologistSelect.value = state.user.psychologistId;
-      experienceInput.value = state.user.experience || '';
-      expertiseInput.value = state.user.expertise || '';
-      qualificationsInput.value = state.user.qualifications || '';
+      if (user.role === 'counselor' || user.psychologistId) {
+        counselorFields.style.display = 'block';
+        clientFields.style.display = 'none';
+        if (user.psychologistId && psychologistSelect) psychologistSelect.value = String(user.psychologistId);
+        experienceInput.value = user.experience || '';
+        expertiseInput.value = user.expertise || '';
+        qualificationsInput.value = user.qualifications || '';
       } else {
-      clientFields.style.display = 'block';
-      counselorFields.style.display = 'none';
-      cityInput.value = state.user.city || '';
-      ageInput.value = state.user.age || '';
-      genderSelect.value = state.user.gender || '';
-      professionInput.value = state.user.profession || '';
-      maritalSelect.value = state.user.maritalStatus || state.user.marital_status || '';
-      interestsInput.value = state.user.interests || '';
-      issuesInput.value = state.user.issues || '';
+        clientFields.style.display = 'block';
+        counselorFields.style.display = 'none';
+        cityInput.value = user.city || '';
+        ageInput.value = user.age || '';
+        genderSelect.value = user.gender || '';
+        professionInput.value = user.profession || '';
+        maritalSelect.value = user.maritalStatus || user.marital_status || '';
+        interestsInput.value = user.interests || '';
+        issuesInput.value = user.issues || '';
+      }
+    };
+
+    const syncProfileFromServer = async () => {
+      const stored = getStoredAuth();
+      if (!stored || !stored.token) return stored && stored.user ? stored.user : null;
+      try {
+        const meResp = await fetch(`${apiBase}/api/auth`, {
+          headers: { Authorization: `Bearer ${stored.token}` }
+        });
+        if (!meResp.ok) return stored.user;
+        const meJson = await meResp.json().catch(() => ({}));
+        if (meJson && meJson.user) {
+          localStorage.setItem('mindconnect-auth', JSON.stringify({ user: meJson.user, token: stored.token }));
+          return meJson.user;
+        }
+      } catch (e) {
+        console.warn('Profile sync failed', e);
+      }
+      return stored.user;
+    };
+
+    const activeUser = await syncProfileFromServer();
+    if (!activeUser) {
+      window.location.href = `${pagePrefix}login.html`;
+      return;
     }
+    hydrateProfileForm(activeUser);
 
     let avatarDataUrl = null;
     if (avatarInput) {
@@ -743,12 +1063,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const loadProfileBookings = async () => {
+      const currentUserState = getStoredAuth();
+      const activeProfileUser = currentUserState && currentUserState.user ? currentUserState.user : state.user;
       let bookings = [];
-      if (state.user.role === 'counselor' && state.user.psychologistId) {
-        const res = await fetch(`${apiBase}/api/bookings?psychologistId=${state.user.psychologistId}`);
+      if (activeProfileUser.role === 'counselor' && activeProfileUser.psychologistId) {
+        const res = await fetch(`${apiBase}/api/bookings?psychologistId=${activeProfileUser.psychologistId}`);
         bookings = await res.json();
-      } else if (state.user.email) {
-        const res = await fetch(`${apiBase}/api/bookings?userEmail=${encodeURIComponent(state.user.email)}`);
+      } else if (activeProfileUser.email) {
+        const res = await fetch(`${apiBase}/api/bookings?userEmail=${encodeURIComponent(activeProfileUser.email)}`);
         bookings = await res.json();
       }
 
@@ -847,9 +1169,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!confirm('Нэр хоосон байна. Үргэлжлүүлэх үү?')) return;
       }
 
+      const currentUserState = getStoredAuth();
+      const activeProfileUser = currentUserState && currentUserState.user ? currentUserState.user : state.user;
       const payload = {
         action: 'update',
-        id: state.user.id,
+        id: activeProfileUser.id,
         name: nameInput.value,
         email: emailInput.value,
         phone: phoneInput.value,
@@ -862,9 +1186,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         payload.password = pwdInput.value;
       }
-      if (state.user.role === 'counselor') {
+      if (activeProfileUser.role === 'counselor' || activeProfileUser.psychologistId) {
         payload.role = 'counselor';
-        payload.psychologistId = psychologistSelect.value ? Number(psychologistSelect.value) : null;
+        payload.psychologistId = activeProfileUser.psychologistId || (psychologistSelect && psychologistSelect.value ? Number(psychologistSelect.value) : null);
         payload.experience = experienceInput.value ? Number(experienceInput.value) : 0;
         payload.expertise = expertiseInput.value || null;
         payload.qualifications = qualificationsInput.value || null;
@@ -890,9 +1214,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await res.json();
       if (res.ok) {
         localStorage.setItem('mindconnect-auth', JSON.stringify(result));
+        notifyAuthUpdated();
         alert('Мэдээлэл амжилттай хадгалагдлаа.');
-        // refresh state and header
-        renderAuthState();
+        // refresh state and header (and other UI areas)
+        try { await refreshAllViews(); } catch (e) { /* ignore */ }
       } else {
         alert(result.error || 'Мэдээлэл хадгалах үед алдаа гарлаа');
       }
