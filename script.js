@@ -14,9 +14,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (nav && !nav.querySelector('.nav-admin')) {
     const firstLink = nav.querySelector('a');
     const adminLink = document.createElement('a');
-    adminLink.href = `${pagePrefix}admin.html`;
+    adminLink.href = `${pagePrefix}admin-login.html`;
     adminLink.className = 'nav-admin';
     adminLink.textContent = 'Admin';
+    adminLink.setAttribute('aria-label', 'Admin');
+    adminLink.title = 'Admin';
     if (firstLink) nav.insertBefore(adminLink, firstLink);
     else nav.appendChild(adminLink);
   }
@@ -27,6 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     counselorLink.href = `${pagePrefix}counselor-login.html`;
     counselorLink.className = 'nav-counselor';
     counselorLink.textContent = 'Зөвлөхөөр бүртгүүлэх';
+    counselorLink.setAttribute('aria-label', 'Зөвлөхөөр бүртгүүлэх');
+    counselorLink.title = 'Зөвлөхөөр бүртгүүлэх';
     if (firstLink) nav.insertBefore(counselorLink, firstLink);
     else nav.appendChild(counselorLink);
   }
@@ -60,6 +64,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  if (window.location.pathname.endsWith('/admin-login.html') || window.location.pathname.endsWith('admin-login.html')) {
+    if (getStoredAuth()?.user && (getStoredAuth().user.role === 'admin' || getStoredAuth().user.isAdmin)) {
+      window.location.replace(`${pagePrefix}admin.html`);
+      return;
+    }
+  }
+
   const renderAuthState = () => {
     const state = getStoredAuth();
     const loginHref = window.location.pathname.includes('/pages/') ? 'login.html' : 'pages/login.html';
@@ -85,8 +96,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       if (publicCounselorsMenu) {
-        const hideCounselorMenu = !!(state?.user && (state.user.role === 'counselor' || state.user.psychologistId));
-        publicCounselorsMenu.style.display = hideCounselorMenu ? 'none' : '';
+        const isPsychologistsPage = window.location.pathname.endsWith('/psychologists.html') || window.location.pathname.endsWith('psychologists.html');
+        if (isPsychologistsPage) {
+          publicCounselorsMenu.style.display = '';
+        } else {
+          const hideCounselorMenu = !!(state?.user && (state.user.role === 'counselor' || state.user.psychologistId));
+          publicCounselorsMenu.style.display = hideCounselorMenu ? 'none' : '';
+        }
       }
 
       if (counselorProfileMenu) {
@@ -132,9 +148,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const homeLinks = Array.from(document.querySelectorAll('a[href$="index.html"], a[href$="/index.html"], a[href$="../index.html"]'));
       const shouldHideParent = !!(state?.user && state.user.role === 'counselor');
 
+      const isPsychologistsPage = window.location.pathname.endsWith('/psychologists.html') || window.location.pathname.endsWith('psychologists.html');
+
       [hero, filters].forEach((el) => {
         if (!el) return;
-        if (shouldHideParent) {
+        if (shouldHideParent && !isPsychologistsPage) {
           if (el._origDisplay === undefined) el._origDisplay = el.style.display || '';
           el.style.display = 'none';
         } else {
@@ -144,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       homeLinks.forEach((a) => {
-        if (shouldHideParent) {
+        if (shouldHideParent && !isPsychologistsPage) {
           if (a._origDisplay === undefined) a._origDisplay = a.style.display || '';
           a.style.display = 'none';
         } else {
@@ -171,9 +189,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const redirectAfterAuth = (result) => {
     const user = result && result.user ? result.user : null;
     const isCounselorLogin = !!(user && (user.role === 'counselor' || user.psychologistId));
+    const isAdminLogin = !!(user && (user.role === 'admin' || user.isAdmin));
     const target = isCounselorLogin
       ? (window.location.pathname.includes('/pages/') ? 'profile.html' : 'pages/profile.html')
-      : '/index.html';
+      : isAdminLogin
+        ? (window.location.pathname.includes('/pages/') ? 'admin.html' : 'pages/admin.html')
+        : '/index.html';
     window.location.href = target;
   };
 
@@ -269,6 +290,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const response = await fetch(`${apiBase}/api/psychologists/${psychologistId}`);
     const psychologist = await response.json();
 
+    const pageTitle = document.querySelector('.page-title');
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageTitle) pageTitle.textContent = psychologist.name || 'Зөвлөх';
+    if (pageSubtitle) pageSubtitle.textContent = `Зөвлөх · ${psychologist.experience || 0} жил туршлага · ${psychologist.city || 'Улаанбаатар'}`;
+
     const today = new Date();
     let selectedSlotInitial = psychologist.availability[0] || '';
     let selectedDateInitial = today.toISOString().substring(0, 10);
@@ -311,17 +337,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       : `<input type="tel" name="phone" placeholder="Утасны дугаар (заавал нэр үгүй бол)" />`;
 
     detailContainer.innerHTML = `
-      <article class="info-card">
-        <div class="avatar">${psychologist.name.charAt(0)}</div>
-        <h3>${psychologist.name}</h3>
-        <p>${psychologist.specialty} · ${psychologist.focus}</p>
-        <ul>
-          <li>Туршлага: ${psychologist.experience} жил</li>
-          <li>Үйлчилгээний үнэ: ₮${psychologist.price.toLocaleString()}</li>
-          <li>Үнэлгээ: ${psychologist.rating.toFixed(1)}/5</li>
-          <li>Хот: ${psychologist.city}</li>
-        </ul>
-      </article>
       <article class="booking-card">
         <h3>Цаг сонгох</h3>
         <div class="date-row">

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin нэвтрэх | MindConnect Mongolia</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark">M</span>
+          <span>MindConnect Mongolia</span>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="site-nav">
+          <a href="../index.html">Нүүр хуудас</a>
+          <a href="psychologists.html">Зөвлөхүүд</a>
+          <a href="../index.html#faq">FAQ</a>
+          <a href="../index.html#contact">Холбоо барих</a>
+          <a href="login.html" class="nav-cta">Нэвтрэх</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 3rem 0;">
+      <section class="form-card">
+        <p class="eyebrow">Admin</p>
+        <h1 class="page-title">Админ нэвтрэх</h1>
+        <p class="page-subtitle">Имэйл болон админ нууц үгээ оруулна уу.</p>
+
+        <form id="login-form">
+          <input type="email" name="email" placeholder="Имэйл" required />
+          <input type="password" name="password" placeholder="Нууц үг" required />
+          <button class="btn btn-primary" type="submit">Нэвтрэх</button>
+        </form>
+
+        <hr style="margin: 1.5rem 0;" />
+
+        <p class="eyebrow">Admin бүртгэл</p>
+        <form id="register-form">
+          <input type="hidden" name="role" value="admin" />
+          <label>
+            Нэр
+            <input type="text" name="name" placeholder="Таны нэр" required />
+          </label>
+          <label>
+            Имэйл
+            <input type="email" name="email" placeholder="Имэйл" required />
+          </label>
+          <label>
+            Утас
+            <input type="tel" name="phone" placeholder="Утас" />
+          </label>
+          <label>
+            Нууц үг
+            <input type="password" name="password" placeholder="Нууц үг" required />
+          </label>
+          <button class="btn btn-primary" type="submit">Админ бүртгүүлэх</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="../script.js"></script>
+  </body>
+</html>
