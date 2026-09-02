@@ -8,6 +8,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const consultationModal = document.getElementById('consultation-modal');
+  if (consultationModal) {
+    const consultationState = { step: 1, topic: '', specialty: '', format: '', gender: 'any', age: 'any', location: 'Улаанбаатар' };
+    const panels = consultationModal.querySelectorAll('[data-consultation-step]');
+    const progressSteps = consultationModal.querySelectorAll('[data-progress-step]');
+    const showConsultationStep = (step) => {
+      consultationState.step = step;
+      panels.forEach((panel) => { panel.hidden = Number(panel.dataset.consultationStep) !== step; });
+      progressSteps.forEach((item) => item.classList.toggle('active', Number(item.dataset.progressStep) <= step));
+    };
+    const closeConsultation = () => { consultationModal.hidden = true; document.body.classList.remove('modal-open'); };
+    document.querySelectorAll('[data-open-consultation]').forEach((button) => button.addEventListener('click', () => { consultationModal.hidden = false; document.body.classList.add('modal-open'); showConsultationStep(1); }));
+    consultationModal.querySelectorAll('[data-close-consultation]').forEach((button) => button.addEventListener('click', closeConsultation));
+    consultationModal.querySelectorAll('[data-previous-step]').forEach((button) => button.addEventListener('click', () => showConsultationStep(Math.max(1, consultationState.step - 1))));
+    consultationModal.querySelectorAll('[data-topic]').forEach((button) => button.addEventListener('click', () => { consultationState.topic = button.dataset.topic; showConsultationStep(2); }));
+    consultationModal.querySelectorAll('[data-specialty]').forEach((button) => button.addEventListener('click', () => { consultationState.specialty = button.dataset.specialty; showConsultationStep(3); }));
+    consultationModal.querySelectorAll('[data-preference]').forEach((field) => field.addEventListener('change', () => { consultationState[field.dataset.preference] = field.value; }));
+    consultationModal.querySelector('[data-next-step]')?.addEventListener('click', () => showConsultationStep(4));
+    consultationModal.querySelectorAll('[data-format]').forEach((button) => button.addEventListener('click', () => { consultationState.format = button.dataset.format; consultationModal.querySelector('.location-field').hidden = consultationState.format !== 'in-person'; }));
+    consultationModal.querySelector('[data-finish-consultation]')?.addEventListener('click', () => { const query = new URLSearchParams(consultationState); window.location.href = `pages/psychologists.html?${query.toString()}`; });
+  }
+
   const pagePrefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
 
   // Insert admin and counselor links in nav (if not already present)

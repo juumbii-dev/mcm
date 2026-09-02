@@ -28,13 +28,53 @@
         </button>
         <nav class="site-nav site-nav--dark">
           <a href="index.html">Нүүр хуудас</a>
-          <a href="pages/psychologists.html">Зөвлөхүүд</a>
+          <button class="nav-menu-trigger" type="button" data-open-consultation>Зөвлөгөө сонгох <span aria-hidden="true">⌄</span></button>
           <a href="#faq">FAQ</a>
           <a href="#contact">Холбоо барих</a>
           <a href="pages/login.html" class="nav-cta">Нэвтрэх</a>
         </nav>
       </div>
     </header>
+
+    <div class="consultation-modal" id="consultation-modal" hidden>
+      <div class="consultation-backdrop" data-close-consultation></div>
+      <section class="consultation-dialog" role="dialog" aria-modal="true" aria-labelledby="consultation-title">
+        <button class="consultation-close" type="button" aria-label="Цонх хаах" data-close-consultation>×</button>
+        <div class="consultation-progress" aria-label="Сонголтын явц">
+          <span class="consultation-step active" data-progress-step="1">01</span><i></i><span class="consultation-step" data-progress-step="2">02</span><i></i><span class="consultation-step" data-progress-step="3">03</span><i></i><span class="consultation-step" data-progress-step="4">04</span>
+        </div>
+        <div class="consultation-panel" data-consultation-step="1">
+          <p class="eyebrow">Танд тохирох дэмжлэг</p>
+          <h2 id="consultation-title">Ямар төрлийн зөвлөгөө хэрэгтэй вэ?</h2>
+          <p class="consultation-intro">Танд хамгийн ойр сэдвийг сонгоход бид тохирох зөвлөхүүдийг санал болгоно.</p>
+          <div class="consultation-options consultation-options--topics">
+            <button type="button" data-topic="personal">Хувь хүний зөвлөгөө <small>Өөрийгөө ойлгох, хөгжүүлэх</small></button>
+            <button type="button" data-topic="relationship">Хосын харилцааны зөвлөгөө <small>Харилцаа, ойлголцол</small></button>
+            <button type="button" data-topic="teen">Өсвөр насны зөвлөгөө <small>Өсөлт, өөрчлөлт, дэмжлэг</small></button>
+            <button type="button" data-topic="other">Бусад <small>Танд хэрэгтэй өөр сэдэв</small></button>
+          </div>
+        </div>
+        <div class="consultation-panel" data-consultation-step="2" hidden>
+          <p class="eyebrow">Таны хэрэгцээ</p>
+          <h2>Ямар чиглэлээр тусламж авах вэ?</h2>
+          <div class="consultation-options consultation-options--specialties">
+            <button type="button" data-specialty="Communication problems">Харилцааны асуудал</button><button type="button" data-specialty="Life purpose">Амьдралын зорилго</button><button type="button" data-specialty="Isolation / loneliness">Ганцаардал</button><button type="button" data-specialty="Self-love">Өөрийгөө хайрлах</button><button type="button" data-specialty="Social anxiety and phobia">Нийгмийн айдас</button><button type="button" data-specialty="Guilt and shame">Гэм буруу, ичгүүр</button><button type="button" data-specialty="Post-traumatic stress">Гэмтлийн дараах стресс</button><button type="button" data-specialty="Panic disorder and panic attacks">Сандралын дайралт</button><button type="button" data-specialty="Stress and anxiety">Стресс, түгшүүр</button><button type="button" data-specialty="Relationship issues">Харилцааны асуудал</button><button type="button" data-specialty="Family conflicts">Гэр бүлийн зөрчил</button><button type="button" data-specialty="Trauma and abuse">Гэмтэл, хүчирхийлэл</button><button type="button" data-specialty="Coping with grief and loss">Гашуудал, гарз хохирол</button><button type="button" data-specialty="Parenting issues">Хүүхэд хүмүүжил</button><button type="button" data-specialty="Motivation, self esteem, and confidence">Урам зориг, өөртөө итгэх итгэл</button><button type="button" data-specialty="Anger management">Уур бухимдлын менежмент</button><button type="button" data-specialty="Career difficulties">Карьерын бэрхшээл</button><button type="button" data-specialty="Coping with life changes">Амьдралын өөрчлөлт</button><button type="button" data-specialty="Executive and professional coaching">Мэргэжлийн коучинг</button><button type="button" data-specialty="Concentration, memory and focus (ADHD)">Төвлөрөл, ой тогтоолт (ADHD)</button>
+          </div>
+          <button class="consultation-back" type="button" data-previous-step>Буцах</button>
+        </div>
+        <div class="consultation-panel" data-consultation-step="3" hidden>
+          <p class="eyebrow">Тохирох зөвлөх</p><h2>Та ямар зөвлөхтэй уулзахыг хүсэж байна вэ?</h2>
+          <div class="consultation-form-grid"><label>Хүйс<select data-preference="gender"><option value="any">Хамаарахгүй</option><option value="female">Эмэгтэй</option><option value="male">Эрэгтэй</option></select></label><label>Насны ангилал<select data-preference="age"><option value="any">Хамаарахгүй</option><option value="young">Залуу зөвлөх</option><option value="experienced">Туршлагатай зөвлөх</option></select></label></div>
+          <button class="btn btn-primary consultation-next" type="button" data-next-step>Үргэлжлүүлэх</button><button class="consultation-back" type="button" data-previous-step>Буцах</button>
+        </div>
+        <div class="consultation-panel" data-consultation-step="4" hidden>
+          <p class="eyebrow">Уулзалтын хэлбэр</p><h2>Та хаана, хэрхэн уулзах вэ?</h2>
+          <div class="consultation-options consultation-options--format"><button type="button" data-format="online">Онлайнаар <small>Хаанаас ч холбогдоно</small></button><button type="button" data-format="in-person">Биечлэн <small>Өөрт ойр зөвлөхийг хайна</small></button></div>
+          <label class="location-field" hidden>Аймаг / дүүрэг<select data-preference="location"><option value="Улаанбаатар">Улаанбаатар</option><option value="Баянзүрх дүүрэг">Баянзүрх дүүрэг</option><option value="Сүхбаатар дүүрэг">Сүхбаатар дүүрэг</option><option value="Хан-Уул дүүрэг">Хан-Уул дүүрэг</option><option value="Чингэлтэй дүүрэг">Чингэлтэй дүүрэг</option><option value="Сонгинохайрхан дүүрэг">Сонгинохайрхан дүүрэг</option></select></label>
+          <button class="btn btn-primary consultation-next" type="button" data-finish-consultation>Зөвлөхүүдийг харах</button><button class="consultation-back" type="button" data-previous-step>Буцах</button>
+        </div>
+      </section>
+    </div>
 
     <main>
       <section class="hero hero--jobs">
