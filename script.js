@@ -1,3 +1,34 @@
+let psychologistScorer = null;
+
+window.setPsychologistScorer = (scorer) => {
+  psychologistScorer = scorer;
+};
+
+function renderPsychologistCards(container, psychologists) {
+  const items = psychologists
+    .map((psychologist) => ({ psychologist, score: psychologistScorer ? psychologistScorer(psychologist) : null }))
+    .filter(({ score }) => score !== false)
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+
+  const detailPrefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
+  container.innerHTML = items.length
+    ? items.map(({ psychologist, score }) => `
+          <article class="psych-card">
+            <div class="avatar">${psychologist.name.charAt(0)}</div>
+            ${score !== null ? `<span class="match-badge">${score}% тохирол</span>` : ''}
+            <h3>${psychologist.name}</h3>
+            <p>${psychologist.specialty} · ${psychologist.focus}</p>
+            <div class="meta-row">
+              <span>⭐ ${psychologist.rating.toFixed(1)}</span>
+              <span>₮${psychologist.price.toLocaleString()}</span>
+            </div>
+            <a href="${detailPrefix}psychologist.html?id=${psychologist.id}" class="text-link">Дэлгэрэнгүй</a>
+          </article>
+        `).join('')
+    : '<p class="empty-state">Одоогоор зөвлөхийн мэдээлэл байхгүй байна.</p>';
+  return items.length;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const toggle = document.querySelector('.nav-toggle');
   const nav = document.querySelector('.site-nav');
@@ -10,22 +41,60 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const consultationModal = document.getElementById('consultation-modal');
   if (consultationModal) {
-    const consultationState = { step: 1, topic: '', specialty: '', format: '', gender: 'any', age: 'any', location: 'Улаанбаатар' };
+    const consultationState = { step: 1, topic: '', specialties: [], specialty: '', format: '', gender: 'any', age: 'any', location: 'Улаанбаатар' };
     const panels = consultationModal.querySelectorAll('[data-consultation-step]');
     const progressSteps = consultationModal.querySelectorAll('[data-progress-step]');
+    const nextButtons = consultationModal.querySelectorAll('[data-next-step]');
     const showConsultationStep = (step) => {
       consultationState.step = step;
       panels.forEach((panel) => { panel.hidden = Number(panel.dataset.consultationStep) !== step; });
       progressSteps.forEach((item) => item.classList.toggle('active', Number(item.dataset.progressStep) <= step));
     };
     const closeConsultation = () => { consultationModal.hidden = true; document.body.classList.remove('modal-open'); };
-    document.querySelectorAll('[data-open-consultation]').forEach((button) => button.addEventListener('click', () => { consultationModal.hidden = false; document.body.classList.add('modal-open'); showConsultationStep(1); }));
+    const updateNextButtons = () => {
+      nextButtons.forEach((button) => {
+        const enabled = consultationState.step === 1
+          ? !!consultationState.topic
+          : consultationState.step === 2
+            ? consultationState.specialties.length > 0
+            : !!consultationState.format || consultationState.step === 3;
+        button.disabled = !enabled;
+      });
+    };
+    document.querySelectorAll('[data-open-consultation]').forEach((button) => button.addEventListener('click', () => {
+      consultationState.step = 1;
+      consultationState.topic = '';
+      consultationState.specialties = [];
+      consultationState.specialty = '';
+      consultationState.format = '';
+      consultationModal.querySelectorAll('[data-topic], [data-specialty]').forEach((item) => item.classList.remove('selected'));
+      consultationModal.hidden = false;
+      document.body.classList.add('modal-open');
+      showConsultationStep(1);
+      updateNextButtons();
+    }));
     consultationModal.querySelectorAll('[data-close-consultation]').forEach((button) => button.addEventListener('click', closeConsultation));
     consultationModal.querySelectorAll('[data-previous-step]').forEach((button) => button.addEventListener('click', () => showConsultationStep(Math.max(1, consultationState.step - 1))));
-    consultationModal.querySelectorAll('[data-topic]').forEach((button) => button.addEventListener('click', () => { consultationState.topic = button.dataset.topic; showConsultationStep(2); }));
-    consultationModal.querySelectorAll('[data-specialty]').forEach((button) => button.addEventListener('click', () => { consultationState.specialty = button.dataset.specialty; showConsultationStep(3); }));
+    consultationModal.querySelectorAll('[data-topic]').forEach((button) => button.addEventListener('click', () => {
+      consultationState.topic = button.dataset.topic;
+      consultationModal.querySelectorAll('[data-topic]').forEach((item) => item.classList.toggle('selected', item === button));
+      updateNextButtons();
+    }));
+    consultationModal.querySelectorAll('[data-specialty]').forEach((button) => button.addEventListener('click', () => {
+      const value = button.dataset.specialty;
+      consultationState.specialties = consultationState.specialties.includes(value)
+        ? consultationState.specialties.filter((item) => item !== value)
+        : [...consultationState.specialties, value];
+      consultationState.specialty = consultationState.specialties.join(', ');
+      button.classList.toggle('selected', consultationState.specialties.includes(value));
+      updateNextButtons();
+    }));
     consultationModal.querySelectorAll('[data-preference]').forEach((field) => field.addEventListener('change', () => { consultationState[field.dataset.preference] = field.value; }));
-    consultationModal.querySelector('[data-next-step]')?.addEventListener('click', () => showConsultationStep(4));
+    nextButtons.forEach((button) => button.addEventListener('click', () => {
+      if (button.disabled) return;
+      showConsultationStep(Math.min(4, consultationState.step + 1));
+      updateNextButtons();
+    }));
     consultationModal.querySelectorAll('[data-format]').forEach((button) => button.addEventListener('click', () => { consultationState.format = button.dataset.format; consultationModal.querySelector('.location-field').hidden = consultationState.format !== 'in-person'; }));
     consultationModal.querySelector('[data-finish-consultation]')?.addEventListener('click', () => { const query = new URLSearchParams(consultationState); window.location.href = `pages/psychologists.html?${query.toString()}`; });
   }
@@ -285,24 +354,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const psychologistList = document.getElementById('psychologist-list');
   if (psychologistList) {
-    const response = await fetch(`${apiBase}/api/psychologists`);
-    const psychologists = await response.json();
-    const visiblePsychologists = psychologists;
-
-    psychologistList.innerHTML = visiblePsychologists.length
-      ? visiblePsychologists.map((psychologist) => `
-          <article class="psych-card">
-            <div class="avatar">${psychologist.name.charAt(0)}</div>
-            <h3>${psychologist.name}</h3>
-            <p>${psychologist.specialty} · ${psychologist.focus}</p>
-            <div class="meta-row">
-              <span>⭐ ${psychologist.rating.toFixed(1)}</span>
-              <span>₮${psychologist.price.toLocaleString()}</span>
-            </div>
-            <a href="pages/psychologist.html?id=${psychologist.id}" class="text-link">Дэлгэрэнгүй</a>
-          </article>
-        `).join('')
-      : '<p style="color: var(--muted);">Одоогоор зөвлөхийн мэдээлэл байхгүй байна.</p>';
+    window.refreshPsychologistList = async () => {
+      const response = await fetch(`${apiBase}/api/psychologists`);
+      return renderPsychologistCards(psychologistList, await response.json());
+    };
+    await window.refreshPsychologistList();
   }
 
   const detailContainer = document.getElementById('psychologist-detail');
@@ -359,6 +415,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       : `<input type="tel" name="phone" placeholder="Утасны дугаар (заавал нэр үгүй бол)" />`;
 
     detailContainer.innerHTML = `
+      <article class="psych-profile-summary">
+        <div class="psych-profile-avatar">${(psychologist.name || 'З').charAt(0)}</div>
+        <div class="psych-profile-copy">
+          <p class="eyebrow">Зөвлөхийн профайл</p>
+          <h2>${psychologist.name || 'Зөвлөх'}</h2>
+          <p>${psychologist.experience || 0} жил туршлага · ${psychologist.city || 'Улаанбаатар'}</p>
+          <div class="psych-profile-meta"><span>★ ${(psychologist.rating || 0).toFixed(1)}</span><span>${psychologist.focus || 'Мэргэжлийн зөвлөгөө'}</span><strong>₮${(psychologist.price || 0).toLocaleString()}</strong></div>
+          <p class="psych-profile-bio">${psychologist.bio || 'Үйлчлүүлэгч бүрт тохирсон дэмжлэг үзүүлэхэд анхаардаг.'}</p>
+        </div>
+      </article>
       <article class="booking-card">
         <h3>Цаг сонгох</h3>
         <div class="date-row">
@@ -624,23 +690,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const pl = document.getElementById('psychologist-list');
       if (pl) {
         const res = await fetch(`${apiBase}/api/psychologists`);
-        const psychologists = await res.json();
-        const latest = JSON.parse(localStorage.getItem('mindconnect-auth') || 'null');
-        const visiblePsychologists = psychologists;
-        pl.innerHTML = visiblePsychologists.length
-          ? visiblePsychologists.map((psychologist) => `
-              <article class="psych-card">
-                <div class="avatar">${psychologist.name.charAt(0)}</div>
-                <h3>${psychologist.name}</h3>
-                <p>${psychologist.specialty} · ${psychologist.focus}</p>
-                <div class="meta-row">
-                  <span>⭐ ${psychologist.rating.toFixed(1)}</span>
-                  <span>₮${psychologist.price.toLocaleString()}</span>
-                </div>
-                <a href="pages/psychologist.html?id=${psychologist.id}" class="text-link">Дэлгэрэнгүй</a>
-              </article>
-            `).join('')
-          : '<p style="color: var(--muted);">Одоогоор зөвлөхийн мэдээлэл байхгүй байна.</p>';
+        renderPsychologistCards(pl, await res.json());
       }
     } catch (e) { /* ignore */ }
   };

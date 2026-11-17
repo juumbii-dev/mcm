@@ -26,32 +26,16 @@
       </div>
     </header>
 
-    <main class="container">
-      <section class="page-hero">
+    <main class="container page-shell">
+      <section class="figma-shell" id="figma-app" aria-label="Сэтгэлзүйч сонгох"></section>
+
+      <section class="page-hero legacy-home">
         <p class="eyebrow">MVP</p>
         <h1 class="page-title">Зөвлөхүүдийн жагсаалт</h1>
         <p class="page-subtitle">Чиглэл, хот, үнэ, үнэлгээний дагуу шүүлтүүр хийж, цаг захиалан шийдлээ.</p>
       </section>
 
-      <section class="filter-bar">
-        <div class="filter-group">
-          <select>
-            <option>Бүх чиглэл</option>
-            <option>Стресс</option>
-            <option>Хосуудын харилцаа</option>
-            <option>Хүүхэд</option>
-          </select>
-          <select>
-            <option>Бүх хот</option>
-            <option>Улаанбаатар</option>
-            <option>Дархан</option>
-            <option>Эрдэнэт</option>
-          </select>
-        </div>
-        <a class="btn btn-primary" href="register.html">Бүртгүүлэх</a>
-      </section>
-
-      <section id="psychologist-list" class="cards-grid">
+      <section id="psychologist-list" class="cards-grid legacy-home">
         <!-- Populated dynamically by script.js. When a counselor is logged in,
              only their associated counselor card will be shown and parent page
              elements (hero/filter) will be hidden. -->
@@ -64,6 +48,7 @@
       </div>
     </footer>
 
+    <script src="../figma-flow.js"></script>
     <script src="../script.js"></script>
   </body>
 </html>

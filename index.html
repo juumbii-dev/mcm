@@ -16,7 +16,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="home-redesign">
     <header class="site-header site-header--dark">
       <div class="container nav-wrap">
         <a class="brand brand--light" href="index.html">
@@ -53,6 +53,7 @@
             <button type="button" data-topic="teen">Өсвөр насны зөвлөгөө <small>Өсөлт, өөрчлөлт, дэмжлэг</small></button>
             <button type="button" data-topic="other">Бусад <small>Танд хэрэгтэй өөр сэдэв</small></button>
           </div>
+          <button class="btn btn-primary consultation-next" type="button" data-next-step disabled>Үргэлжлүүлэх →</button>
         </div>
         <div class="consultation-panel" data-consultation-step="2" hidden>
           <p class="eyebrow">Таны хэрэгцээ</p>
@@ -60,6 +61,7 @@
           <div class="consultation-options consultation-options--specialties">
             <button type="button" data-specialty="Communication problems">Харилцааны асуудал</button><button type="button" data-specialty="Life purpose">Амьдралын зорилго</button><button type="button" data-specialty="Isolation / loneliness">Ганцаардал</button><button type="button" data-specialty="Self-love">Өөрийгөө хайрлах</button><button type="button" data-specialty="Social anxiety and phobia">Нийгмийн айдас</button><button type="button" data-specialty="Guilt and shame">Гэм буруу, ичгүүр</button><button type="button" data-specialty="Post-traumatic stress">Гэмтлийн дараах стресс</button><button type="button" data-specialty="Panic disorder and panic attacks">Сандралын дайралт</button><button type="button" data-specialty="Stress and anxiety">Стресс, түгшүүр</button><button type="button" data-specialty="Relationship issues">Харилцааны асуудал</button><button type="button" data-specialty="Family conflicts">Гэр бүлийн зөрчил</button><button type="button" data-specialty="Trauma and abuse">Гэмтэл, хүчирхийлэл</button><button type="button" data-specialty="Coping with grief and loss">Гашуудал, гарз хохирол</button><button type="button" data-specialty="Parenting issues">Хүүхэд хүмүүжил</button><button type="button" data-specialty="Motivation, self esteem, and confidence">Урам зориг, өөртөө итгэх итгэл</button><button type="button" data-specialty="Anger management">Уур бухимдлын менежмент</button><button type="button" data-specialty="Career difficulties">Карьерын бэрхшээл</button><button type="button" data-specialty="Coping with life changes">Амьдралын өөрчлөлт</button><button type="button" data-specialty="Executive and professional coaching">Мэргэжлийн коучинг</button><button type="button" data-specialty="Concentration, memory and focus (ADHD)">Төвлөрөл, ой тогтоолт (ADHD)</button>
           </div>
+          <button class="btn btn-primary consultation-next" type="button" data-next-step disabled>Үргэлжлүүлэх →</button>
           <button class="consultation-back" type="button" data-previous-step>Буцах</button>
         </div>
         <div class="consultation-panel" data-consultation-step="3" hidden>
@@ -77,7 +79,9 @@
     </div>
 
     <main>
-      <section class="hero hero--jobs">
+      <section class="figma-shell" id="figma-app" aria-label="Сэтгэлзүйч сонгох"></section>
+
+      <section class="hero hero--jobs legacy-home">
         <div class="container hero-grid hero-grid--jobs">
           <div class="hero-copy">
             <div class="hero-badges">
@@ -129,7 +133,7 @@
         </div>
       </section>
 
-      <section class="section">
+      <section class="section legacy-home">
         <div class="container">
           <div class="section-heading">
             <p class="eyebrow">Үйлчилгээ</p>
@@ -155,7 +159,7 @@
         </div>
       </section>
 
-      <section class="section alt-bg">
+      <section class="section alt-bg legacy-home">
         <div class="container">
           <div class="section-heading">
             <p class="eyebrow">Зөвлөхүүд</p>
@@ -210,6 +214,7 @@
       </div>
     </footer>
 
+    <script src="figma-flow.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
