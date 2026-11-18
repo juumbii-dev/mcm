@@ -71,6 +71,7 @@
   ];
 
   const DAY_NAMES = ['Ням', 'Даваа', 'Мягмар', 'Лхагва', 'Пүрэв', 'Баасан', 'Бямба'];
+  const REFERENCE_AVAILABILITY = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
 
   // Display profiles of the design's therapists. The database holds the bookable rows (same names);
   // fields the database has no columns for (photo, gender, age, categories, formats, sessions) live here.
@@ -130,14 +131,19 @@
   const initialState = () => ({
     step: 0, category: '', specs: [], gender: 'any', ageGroup: '', format: '', aimag: '', district: '',
     screen: 'match', therapist: null, note: '',
-    slots: [], offered: [], selectedSlot: null,
+    slots: [], offered: [], selectedSlot: null, bookingId: null,
     cancelHours: 2, rescheduleHours: 24, paymentHoursBefore: 24, noRefundHours: 2, refundHours: 3,
     meetingLink: null, payment: '', submitting: false, error: ''
   });
 
   let s = initialState();
-  let therapists = [];
-  let status = 'loading';
+  const designTherapists = Object.entries(PROFILES).map(([name, profile], index) => ({
+    ...profile,
+    id: 101 + index,
+    name,
+    availability: REFERENCE_AVAILABILITY.slice()
+  }));
+  let therapists = designTherapists;
 
   const esc = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const formatPrice = (n) => `${Number(n || 0).toLocaleString('mn-MN')}₮`;
@@ -308,13 +314,12 @@
   };
 
   const resultsScreen = () => {
-    if (status === 'loading') return `<div class="fa-hero"><p class="fa-sub">Сэтгэлзүйчдийг ачаалж байна...</p></div>`;
     const matches = getMatches();
     const header = `
       <div class="fa-hero fa-hero-results">
         <div class="fa-spark">✦</div>
         <h2 class="fa-h2">Таны хувьд <em>тохирох</em><br />сэтгэлзүйчид</h2>
-        <p class="fa-sub sm">${status === 'error' ? 'Сэтгэлзүйчдийн мэдээллийг ачаалж чадсангүй' : matches.length > 0 ? `${matches.length} сэтгэлзүйч олдлоо — 50%+ тохирол` : 'Тохирох сэтгэлзүйч олдсонгүй'}</p>
+        <p class="fa-sub sm">${matches.length > 0 ? `${matches.length} сэтгэлзүйч олдлоо — 50%+ тохирол` : 'Тохирох сэтгэлзүйч олдсонгүй'}</p>
       </div>`;
     const empty = matches.length === 0
       ? card(`<p class="fa-muted-center">Шалгуураа өөрчлөн дахин хайна уу.</p><div class="fa-mt">${btn('Дахин эхлэх', 'reset')}</div>`, 'fa-empty')
@@ -516,8 +521,8 @@
         Таны захиалга бүрэн баталгаажлаа! ✅<br />
         <strong>${esc(t.name)}</strong> — ${esc(sel.label)}, ${esc(sel.time)}–${endTime(sel.time)}<br />
         ${s.meetingLink && s.format === 'online' ? `Уулзалтын холбоос: <em>meet.setgelzuich.mn/...</em><br />` : ''}
-        Төлбөр: <strong>${formatPrice(t.price)}</strong> — амжилттай хүлээн авлаа.`)}
-      ${btn(s.payment ? 'Дуусгах ✓' : 'Төлбөрийн хэрэгсэл сонгоно уу', 'reset', { disabled: !s.payment })}`;
+        Төлбөр: <strong>${formatPrice(t.price)}</strong> — ${esc(s.payment)} хэрэгслээр төлөхөөр сонгосон.`)}
+      ${btn(s.payment ? 'Хадгалах ✓' : 'Төлбөрийн хэрэгсэл сонгоно уу', 'finish-payment', { disabled: !s.payment })}`;
   };
 
   const bookingFlow = () => {
@@ -599,10 +604,13 @@
           email: authUser ? (authUser.email || '') : '',
           date: sel.date,
           slot: sel.time,
-          notes
+          notes,
+          format: s.format
         })
       });
       if (!response.ok) throw new Error('Захиалга хадгалах үед алдаа гарлаа. Дахин оролдоно уу.');
+      const booking = await response.json();
+      s.bookingId = booking.id;
       s.screen = 'booking-confirmed';
     } catch (error) {
       s.error = error.message || 'Захиалга хадгалах үед алдаа гарлаа. Дахин оролдоно уу.';
@@ -637,6 +645,30 @@
     },
     meeting: (v) => { s.meetingLink = v === 'true'; },
     pay: (v) => { s.payment = v; },
+    'finish-payment': async () => {
+      if (!s.bookingId || !s.payment || s.submitting) return;
+      s.submitting = true;
+      s.error = '';
+      render();
+      try {
+        const response = await fetch(`${apiBase}/api/bookings/${s.bookingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'confirmed',
+            format: s.format,
+            paymentMethod: s.payment,
+            meetingLink: s.meetingLink === true
+          })
+        });
+        if (!response.ok) throw new Error('Захиалгын мэдээллийг хадгалж чадсангүй. Дахин оролдоно уу.');
+        reset();
+      } catch (error) {
+        s.error = error.message || 'Захиалгын мэдээллийг хадгалж чадсангүй. Дахин оролдоно уу.';
+        s.submitting = false;
+        render();
+      }
+    },
     'send-request': () => { s.screen = 'therapist-availability'; }
   };
 
@@ -689,11 +721,19 @@
   render();
 
   fetch(`${apiBase}/api/psychologists`)
-    .then((response) => response.json())
-    .then((list) => {
-      therapists = (Array.isArray(list) ? list : []).map(toTherapist).filter(Boolean);
-      status = 'ready';
+    .then((response) => {
+      if (!response.ok) throw new Error(`Psychologist request failed (${response.status})`);
+      return response.json();
     })
-    .catch(() => { status = 'error'; })
-    .then(render);
+    .then((list) => {
+      if (!Array.isArray(list)) throw new TypeError('Expected a psychologist list');
+      const loaded = new Map(list.map(toTherapist).filter(Boolean).map((therapist) => [therapist.name, therapist]));
+      therapists = designTherapists.map((therapist) => loaded.get(therapist.name) || therapist);
+      render();
+    })
+    .catch((error) => {
+      console.error('Failed to load psychologist data; using Figma design profiles.', error);
+      therapists = designTherapists;
+      render();
+    });
 })();
