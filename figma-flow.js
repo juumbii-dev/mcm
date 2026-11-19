@@ -64,10 +64,11 @@
   const UB_DISTRICTS = ['Багануур', 'Багахангай', 'Баянгол', 'Баянзүрх', 'Налайх', 'Сонгинохайрхан', 'Сүхбаатар', 'Хан-Уул', 'Чингэлтэй'];
   const OTHER_DISTRICTS = ['Төв', 'Зүүн', 'Баруун', 'Хойд', 'Өмнөд'];
 
+  const PAYMENT_ACCOUNT_NUMBER = '290005005026909442';
+  const SOCIALPAY_NUMBER = '89880034';
   const PAYMENT_METHODS = [
-    { id: 'qpay', label: 'QPay', icon: '📱' },
-    { id: 'socialpay', label: 'SocialPay', icon: '💳' },
-    { id: 'bank', label: 'Банкны шилжүүлэг', icon: '🏦' }
+    { id: 'account-qr', label: 'Дансны QR', icon: '🏦' },
+    { id: 'socialpay', label: 'SocialPay', icon: '💳' }
   ];
 
   const DAY_NAMES = ['Ням', 'Даваа', 'Мягмар', 'Лхагва', 'Пүрэв', 'Баасан', 'Бямба'];
@@ -507,8 +508,20 @@
       <div class="fa-head">${title('Төлбөр &<br /><em>уулзалтын холбоос</em>')}</div>
       ${card(`${label('Төлбөрийн хэрэгсэл')}
         <div class="fa-grid">
-          ${PAYMENT_METHODS.map((pm) => `
-            <button type="button" class="fa-pay${s.payment === pm.id ? ' selected' : ''}" data-act="pay" data-val="${pm.id}"><span>${pm.icon}</span><span class="fa-pay-label">${pm.label}</span>${s.payment === pm.id ? '<span class="fa-pay-check">✓</span>' : ''}</button>`).join('')}
+          <button type="button" class="fa-pay fa-pay-qr${s.payment === 'account-qr' ? ' selected' : ''}" data-act="pay" data-val="account-qr">
+            <span class="fa-pay-label">Дансны QR</span>
+            <span class="fa-qr-box">${QR.toSvg(PAYMENT_ACCOUNT_NUMBER, { level: 'H', margin: 2 })}</span>
+            <span class="fa-pay-sub">Дансны дугаар</span>
+            <span class="fa-pay-value">${PAYMENT_ACCOUNT_NUMBER}</span>
+            ${s.payment === 'account-qr' ? '<span class="fa-pay-check">✓</span>' : ''}
+          </button>
+          <button type="button" class="fa-pay fa-pay-socialpay${s.payment === 'socialpay' ? ' selected' : ''}" data-act="pay" data-val="socialpay">
+            <span class="fa-pay-badge">SP</span>
+            <span class="fa-pay-label">SocialPay дугаар</span>
+            <span class="fa-pay-value">${SOCIALPAY_NUMBER}</span>
+            <span class="fa-pay-sub">SocialPay апп-аас шилжүүлнэ үү</span>
+            ${s.payment === 'socialpay' ? '<span class="fa-pay-check">✓</span>' : ''}
+          </button>
           <div class="fa-total"><span>Нийт дүн</span><strong>${formatPrice(t.price)}</strong></div>
         </div>`, 'fa-mb')}
       ${s.format === 'online' ? card(`${label('Уулзалтын холбоос илгээх эсэх?')}
@@ -521,7 +534,7 @@
         Таны захиалга бүрэн баталгаажлаа! ✅<br />
         <strong>${esc(t.name)}</strong> — ${esc(sel.label)}, ${esc(sel.time)}–${endTime(sel.time)}<br />
         ${s.meetingLink && s.format === 'online' ? `Уулзалтын холбоос: <em>meet.setgelzuich.mn/...</em><br />` : ''}
-        Төлбөр: <strong>${formatPrice(t.price)}</strong> — ${esc(s.payment)} хэрэгслээр төлөхөөр сонгосон.`)}
+        Төлбөр: <strong>${formatPrice(t.price)}</strong> — ${esc((PAYMENT_METHODS.find((pm) => pm.id === s.payment) || {}).label || '')} хэрэгслээр төлөхөөр сонгосон.`)}
       ${btn(s.payment ? 'Хадгалах ✓' : 'Төлбөрийн хэрэгсэл сонгоно уу', 'finish-payment', { disabled: !s.payment })}`;
   };
 
