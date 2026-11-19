@@ -44,8 +44,15 @@ CREATE TABLE IF NOT EXISTS bookings (
   slot TEXT NOT NULL,
   notes TEXT,
   status TEXT DEFAULT 'pending',
+  format TEXT,
+  payment_method TEXT,
+  meeting_link TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS format TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_method TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS meeting_link TEXT;
 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;

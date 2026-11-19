@@ -33,6 +33,7 @@ async function handleBookings(req, res) {
           date: data.date,
           slot: data.slot,
           notes: data.notes || '',
+          format: data.format || null,
         });
         res.statusCode = 201;
         res.end(JSON.stringify(booking));
@@ -56,6 +57,10 @@ async function handleBookings(req, res) {
           date: data.date,
           slot: data.slot,
           notes: data.notes,
+          status: data.status,
+          format: data.format,
+          paymentMethod: data.paymentMethod,
+          meetingLink: data.meetingLink,
         });
         res.statusCode = 200;
         res.end(JSON.stringify(booking));
