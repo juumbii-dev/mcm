@@ -1,7 +1,13 @@
 const { initDatabase, listBookings, createBooking, updateBooking, deleteBooking } = require('../lib/db');
 
 async function handleBookings(req, res) {
-  await initDatabase();
+  try {
+    await initDatabase();
+  } catch (error) {
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: error.message || 'Database init failed' }));
+    return;
+  }
 
   const url = new URL(req.url, `http://${req.headers.host}`);
   const bookingId = url.pathname.split('/').pop();
