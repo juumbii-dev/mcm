@@ -68,7 +68,9 @@
   const SOCIALPAY_NUMBER = '89880034';
   const PAYMENT_METHODS = [
     { id: 'account-qr', label: 'Дансны QR', icon: '🏦' },
-    { id: 'socialpay', label: 'SocialPay', icon: '💳' }
+    { id: 'socialpay', label: 'SocialPay', icon: '💳' },
+    { id: 'qpay', label: 'QPay', icon: '📱' },
+    { id: 'bank', label: 'Банкны шилжүүлэг', icon: '🏦' }
   ];
 
   const DAY_NAMES = ['Ням', 'Даваа', 'Мягмар', 'Лхагва', 'Пүрэв', 'Баасан', 'Бямба'];
@@ -522,6 +524,8 @@
             <span class="fa-pay-sub">SocialPay апп-аас шилжүүлнэ үү</span>
             ${s.payment === 'socialpay' ? '<span class="fa-pay-check">✓</span>' : ''}
           </button>
+          ${PAYMENT_METHODS.filter((pm) => pm.id === 'qpay' || pm.id === 'bank').map((pm) => `
+          <button type="button" class="fa-pay${s.payment === pm.id ? ' selected' : ''}" data-act="pay" data-val="${pm.id}"><span>${pm.icon}</span><span class="fa-pay-label">${pm.label}</span>${s.payment === pm.id ? '<span class="fa-pay-check">✓</span>' : ''}</button>`).join('')}
           <div class="fa-total"><span>Нийт дүн</span><strong>${formatPrice(t.price)}</strong></div>
         </div>`, 'fa-mb')}
       ${s.format === 'online' ? card(`${label('Уулзалтын холбоос илгээх эсэх?')}
