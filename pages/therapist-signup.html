@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Зөвлөхөөр бүртгүүлэх | MindConnect</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <main class="container" style="padding: 3rem 0">
+      <section class="form-card therapist-onboarding" id="therapist-onboarding">
+        <p class="eyebrow" id="onboarding-progress">ONBOARDING 1 / 6</p>
+        <h1 class="page-title">Эхлээд тантай танилцъя</h1>
+        <p class="page-subtitle">Зөвлөхийн профайл үүсгэхэд шаардлагатай мэдээллээ бөглөнө үү.</p>
+        <form id="register-form">
+          <input type="hidden" name="role" value="counselor" />
+          <div class="onboarding-step" data-onboarding-step="1">
+            <label>Нэр<input name="name" required /></label>
+            <label>Имэйл<input name="email" type="email" required /></label>
+            <label>Утас<input name="phone" type="tel" required /></label>
+            <label>Нууц үг<input name="password" type="password" minlength="8" required /></label>
+          </div>
+          <div class="onboarding-step" data-onboarding-step="2" hidden>
+            <label>Боловсрол, зэрэг<textarea name="qualifications" rows="4" required></textarea></label>
+            <label>Туршлага (жил)<input name="experience" type="number" min="0" required /></label>
+          </div>
+          <div class="onboarding-step" data-onboarding-step="3" hidden>
+            <label>Мэргэшил, үйлчилгээ<textarea name="expertise" rows="4" required></textarea></label>
+            <label>Үйлчлүүлэгчдэд туслах чиглэл<textarea name="issues" rows="4"></textarea></label>
+          </div>
+          <div class="onboarding-step" data-onboarding-step="4" hidden>
+            <label>Үнэ (₮)<input name="price" type="number" min="0" /></label>
+            <label>Хот / байршил<input name="city" value="Улаанбаатар" required /></label>
+            <label>Боломжит цаг<input name="availability" placeholder="09:00, 13:00, 18:00" /></label>
+          </div>
+          <div class="onboarding-step" data-onboarding-step="5" hidden>
+            <label>Лицензийн мэдээлэл<textarea name="license" rows="4"></textarea></label>
+            <p class="page-subtitle">Энэ алхам заавал биш. Админ баталгаажуулалтын үед баримт нэмж болно.</p>
+          </div>
+          <div class="onboarding-step" data-onboarding-step="6" hidden>
+            <label>Нийтэд харагдах танилцуулга<textarea name="bio" rows="5" required></textarea></label>
+            <label>Профайлын зураг URL<input name="avatar" type="url" /></label>
+          </div>
+          <div style="display:flex;gap:.75rem;margin-top:1rem">
+            <button class="btn btn-secondary" type="button" id="onboarding-back" hidden>Буцах</button>
+            <button class="btn btn-primary" type="button" id="onboarding-next">Үргэлжлүүлэх</button>
+            <button class="btn btn-primary" type="submit" id="onboarding-submit" hidden>Хүсэлт илгээх</button>
+          </div>
+        </form>
+        <p id="onboarding-message" class="form-message" role="status"></p>
+      </section>
+    </main>
+    <script src="../therapist-portal.js"></script>
+  </body>
+</html>

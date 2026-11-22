@@ -1,1 +1,12 @@
 Figma/
+Figma New/
+Figma New 2/
+data/
+.env*
+!.env.example
+node_modules/
+**/node_modules/
+.vercel/
+.git/
+.tmp-*.json
+tmp-auth.json

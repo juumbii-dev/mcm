@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="mn">
+  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Нууц нэрээр чатлах | MindConnect</title><link rel="stylesheet" href="../styles.css" /></head>
+  <body>
+    <main class="container" style="padding:3rem 0"><section class="form-card ably-chat-thread" id="chat-thread"><p class="eyebrow">ABLY REALTIME CHAT</p><h1 class="page-title">Зөвлөхтэй шууд чатлах</h1><p id="chat-status" class="chat-status">Холбогдож байна...</p><div id="chat-messages" class="chat-messages"></div><form id="chat-message-form" style="display:flex;gap:.5rem"><input name="body" placeholder="Мессеж бичих..." autocomplete="off" required /><button class="btn btn-primary">Илгээх</button></form><p class="chat-retention-note">Мессежүүд database-д хадгалагдахгүй. Энэ chat session зөвхөн booking/session оролцогчдод нээлттэй.</p></section></main>
+    <script src="https://cdn.ably.com/lib/ably.min-3.js"></script>
+    <script src="../script.js"></script><script src="../chat.js"></script>
+  </body>
+</html>

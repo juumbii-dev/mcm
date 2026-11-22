@@ -1,0 +1,181 @@
+MindConnect-ийн үндсэн архитектур:
+
+Хэрэглэгч
+   │
+   ▼
+Vercel / Web Browser
+   │
+   ├── HTML pages
+   │     ├── index.html
+   │     └── pages/
+   │           ├── psychologists.html
+   │           ├── psychologist.html
+   │           ├── booking.html
+   │           ├── login.html
+   │           ├── register.html
+   │           ├── profile.html
+   │           ├── counselor-dashboard.html
+   │           └── admin.html
+   │
+   ├── Frontend JavaScript
+   │     ├── script.js
+   │     └── figma-flow.js
+   │
+   ├── Frontend styles
+   │     └── styles.css
+   │
+   ▼
+API layer
+   │
+   ├── /api/auth
+   │     ├── Register
+   │     ├── Login
+   │     ├── Profile update
+   │     └── User authentication
+   │
+   ├── /api/psychologists
+   │     ├── Зөвлөхүүдийн жагсаалт
+   │     └── Нэг зөвлөхийн мэдээлэл
+   │
+   ├── /api/bookings
+   │     ├── Захиалга үүсгэх
+   │     ├── Захиалга харах
+   │     ├── Захиалга шинэчлэх
+   │     └── Захиалга устгах
+   │
+   └── /api/admin/users
+         ├── Хэрэглэгч харах
+         ├── Хэрэглэгч идэвхжүүлэх/идэвхгүй болгох
+         └── Хэрэглэгч устгах
+
+   ▼
+
+Database abstraction
+   └── lib/db.js
+         │
+         ├── Production:
+         │     Neon PostgreSQL
+         │
+         └── Local development:
+               local JSON database
+
+   ▼
+
+Data
+   ├── users
+   ├── psychologists
+   └── bookings
+
+
+Folder structure:
+
+C:\MCM
+│
+├── index.html                  # Нүүр хуудас
+├── script.js                   # Нийтлэг frontend logic
+├── figma-flow.js               # Figma-ийн зөвлөх сонголт, booking flow
+├── styles.css                  # Нийтлэг загвар
+│
+├── pages/
+│   ├── psychologists.html      # Зөвлөхүүдийн жагсаалт
+│   ├── psychologist.html       # Нэг зөвлөхийн дэлгэрэнгүй
+│   ├── booking.html            # Захиалгын хэсэг
+│   ├── login.html              # Нэвтрэх
+│   ├── register.html           # Бүртгүүлэх
+│   ├── profile.html            # Хэрэглэгчийн profile
+│   ├── counselor-login.html    # Зөвлөхийн нэвтрэх
+│   ├── counselor-dashboard.html# Зөвлөхийн самбар
+│   ├── admin-login.html        # Admin нэвтрэх
+│   └── admin.html              # Admin самбар
+│
+├── api/
+│   ├── db-auth.js              # Auth API
+│   ├── db-psychologists.js     # Зөвлөх API
+│   ├── db-bookings.js          # Захиалгын API
+│   └── db-admin.js             # Admin API
+│
+├── lib/
+│   └── db.js                   # Database access layer
+│
+├── db/
+│   └── migrations/
+│       └── 001_initial.sql     # Database schema
+│
+├── server.js                   # Local Node.js server
+├── vercel.json                 # Vercel routing
+├── package.json
+│
+└── Figma/
+    └── Therapist Matching Interface/
+        └── src/App.tsx         # Figma reference implementation
+
+Гол хэрэглэгчийн урсгал:
+
+Нүүр хуудас
+   │
+   ▼
+“Зөвлөгөө сонгох”
+   │
+   ├── 1. Зөвлөгөөний төрөл сонгох
+   ├── 2. Мэргэшлийн чиглэл сонгох
+   ├── 3. Зөвлөхийн хүйс, нас сонгох
+   ├── 4. Онлайн / биечлэн сонгох
+   ├── 5. Байршил сонгох
+   │
+   ▼
+Matching algorithm
+   │
+   ├── Category match
+   ├── Specialization match
+   ├── Gender match
+   ├── Age match
+   ├── Format match
+   └── Match percentage
+   │
+   ▼
+Тохирох зөвлөхүүд
+   │
+   ├── Дэлгэрэнгүй харах
+   └── Цаг захиалах
+         │
+         ├── Боломжит цаг сонгох
+         ├── Захиалга илгээх
+         ├── Захиалгыг баталгаажуулах
+         ├── Төлбөрийн хэрэгсэл сонгох
+         └── Уулзалтын холбоосын сонголт
+               │
+               ▼
+         Booking хадгалагдана
+
+Database-ийн үндсэн хүснэгтүүд:
+
+users
+├── id
+├── name
+├── email
+├── password_hash
+├── role
+├── psychologist_id
+├── profile мэдээлэл
+└── is_admin
+
+Deployment architecture:
+
+GitHub repository
+       │
+       ▼
+Vercel
+       │
+       ├── Static HTML/CSS/JS
+       ├── API endpoints
+       └── Environment variables
+              │
+              └── DATABASE_URL
+                       │
+                       ▼
+                  Neon PostgreSQL
+
+ene tusliin hureend edgeer buttsiig ashiglana
+mun:  NestJS ashiglahgui,  server side, mun Neon дээр тусдаа database branch болгон байрлуулсан. Neon dev branch, 2 baaz hutluhgui. tegeheed shuud neg baaz ashiglana, neon DB, neon.tech  buguud ali boloh minimal architecture ashiglana.
+
+deerh bugdiig ali boloh barimtlah buguud zailshgui tohioldold uurchilj bolno. Umnuh code -iig deerh ruu hurvuulj, deerh buttsed tohiruulan uurchil

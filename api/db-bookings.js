@@ -32,17 +32,20 @@ async function handleBookings(req, res) {
     req.on('end', async () => {
       try {
         const data = JSON.parse(body);
+        const isFigmaBooking = data.therapist !== undefined || data.time !== undefined;
         const booking = await createBooking({
-          psychologistId: Number(data.psychologistId),
-          name: data.name,
-          email: data.email,
+          psychologistId: Number(data.psychologistId ?? data.therapist),
+          name: data.name || 'Зочин',
+          email: data.email || '',
           date: data.date,
-          slot: data.slot,
-          notes: data.notes || '',
+          slot: data.slot ?? data.time,
+          notes: data.notes ?? data.note ?? '',
           format: data.format || null,
+          paymentMethod: data.paymentMethod || null,
+          meetingLink: data.meetingLink || null,
         });
         res.statusCode = 201;
-        res.end(JSON.stringify(booking));
+        res.end(JSON.stringify(isFigmaBooking ? { ...booking, bookingId: booking.id } : booking));
       } catch (error) {
         res.statusCode = 500;
         res.end(JSON.stringify({ error: error.message || 'Booking failed' }));

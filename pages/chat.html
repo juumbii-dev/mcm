@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Зөвлөхтэй чатлах | MindConnect</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body class="chat-page">
+    <header class="chat-header">
+      <a href="../index.html">Сэтгэлзүйч</a>
+      <a class="chat-home-link" href="../index.html">← НҮҮР РҮҮ БУЦАХ</a>
+    </header>
+
+    <main class="chat-main">
+      <section class="chat-hero">
+        <div>
+          <p class="chat-eyebrow">SUPABASE REALTIME CHAT</p>
+          <h1>Танд тохирох зөвлөхтэй яг<br />одоо ярилцаарай</h1>
+          <p>Бүртгэл, нэвтрэлт шаардахгүй. Асуудлын чиглэл болон боломжит цагаар шууд зөвлөхүүдтэйгээ чат эхлүүлнэ.</p>
+        </div>
+        <div class="chat-hero-note">
+          <strong>Ухаалаг туслахын зөвлөгөө</strong>
+          <span>Яаралтай асуудал нөхцөлд чат хүлээлгүй 103 эсвэл орон нутгийн тусламжийн байгууллагад хандахыг зөвлөе.</span>
+        </div>
+      </section>
+
+      <section class="chat-filters" aria-label="Зөвлөх шүүх">
+        <label><span class="sr-only">Зөвлөгөөний төрөл</span><select id="chat-category"><option value="">Бүх зөвлөгөө</option><option value="personal">Хувь хүний зөвлөгөө</option><option value="couples">Хосын зөвлөгөө</option><option value="teen">Өсвөр насны зөвлөгөө</option><option value="family">Хүүхдийн зөвлөгөө</option></select></label>
+        <label><span class="sr-only">Мэргэшил</span><select id="chat-specialty"><option value="">Бүх мэргэшил</option></select></label>
+        <label><span class="sr-only">Боломжит өдөр</span><select id="chat-day"><option value="">Бүх боломжит өдөр</option><option value="today">Өнөөдөр</option><option value="tomorrow">Маргааш</option></select></label>
+        <label><span class="sr-only">Цаг</span><input id="chat-time" type="time" aria-label="Цаг сонгох" /></label>
+      </section>
+
+      <section aria-labelledby="chat-list-title">
+        <p class="chat-eyebrow chat-list-label">6 ЗӨВЛӨХ ОЛДЛОО</p>
+        <h2 id="chat-list-title">Зөвлөхөө сонгоно уу</h2>
+        <div id="chat-therapists" class="chat-therapist-grid" aria-live="polite"></div>
+      </section>
+    </main>
+    <div class="chat-profile-modal" id="chat-profile-modal" hidden>
+      <div class="chat-profile-backdrop" data-close-profile></div>
+      <section class="chat-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="chat-profile-name">
+        <button class="chat-profile-close" type="button" aria-label="Цонх хаах" data-close-profile>×</button>
+        <div id="chat-profile-content"></div>
+      </section>
+    </div>
+    <script src="../script.js"></script>
+    <script src="../chat.js"></script>
+  </body>
+</html>

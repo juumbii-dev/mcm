@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isCounselorLogin = !!(user && (user.role === 'counselor' || user.psychologistId));
     const isAdminLogin = !!(user && (user.role === 'admin' || user.isAdmin));
     const target = isCounselorLogin
-      ? (window.location.pathname.includes('/pages/') ? 'profile.html' : 'pages/profile.html')
+      ? (window.location.pathname.endsWith('therapist-login.html') ? 'therapist-profile.html' : (window.location.pathname.includes('/pages/') ? 'profile.html' : 'pages/profile.html'))
       : isAdminLogin
         ? (window.location.pathname.includes('/pages/') ? 'admin.html' : 'pages/admin.html')
         : '/index.html';

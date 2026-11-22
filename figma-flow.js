@@ -147,6 +147,11 @@
     availability: REFERENCE_AVAILABILITY.slice()
   }));
   let therapists = designTherapists;
+  const requestedTherapistId = new URLSearchParams(window.location.search).get('id');
+  if (requestedTherapistId) {
+    s.therapist = designTherapists.find((therapist) => String(therapist.id) === String(requestedTherapistId)) || null;
+    if (s.therapist) s.screen = 'profile';
+  }
 
   const esc = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const formatPrice = (n) => `${Number(n || 0).toLocaleString('mn-MN')}₮`;
@@ -262,7 +267,13 @@
           ${s.category === cat.id ? '<span class="fa-cat-check">✓</span>' : ''}
         </button>`).join('')}
     </div>
-    <button type="button" class="fa-continue" data-act="next"${s.category ? '' : ' disabled'}>Үргэлжлүүлэх →</button>`;
+    <button type="button" class="fa-continue" data-act="next"${s.category ? '' : ' disabled'}>Үргэлжлүүлэх →</button>
+    <p class="fa-therapist-link">Та зөвлөх үү? <a href="therapist-signup">Зөвлөхөөр бүртгүүлэх</a></p>
+    <a class="fa-chat-card" href="chat">
+      <strong>Зөвлөхтэй чатлах</strong>
+      <span>Chatbot-оор зөвлөх сонгох эсвэл шууд чат эхлүүлэх</span>
+      <b aria-hidden="true">→</b>
+    </a>`;
 
   const stepSpecs = () => `
     <div class="fa-head">
@@ -362,7 +373,10 @@
 
   const backLink = (screen) => `<button type="button" class="fa-back" data-act="goto" data-val="${screen}">← Буцах</button>`;
 
-  const profileScreen = (t) => `
+  const profileScreen = (t) => {
+    const locationSelected = s.format === 'inperson' && s.aimag && s.district;
+    const canBook = s.format === 'online' || locationSelected;
+    return `
     ${backLink('match')}
     ${card(`
       <div class="fa-th-head">
@@ -375,8 +389,22 @@
       </div>
       <p class="fa-bio">${esc(t.bio)}</p>`, 'fa-mb')}
     ${card(`${label('Мэргэшлийн чиглэлүүд')}<div class="fa-tags">${t.specializations.map((x) => tag(x, s.specs.includes(x))).join('')}</div>`, 'fa-mb')}
-    ${card(`${label('Уулзалтын хэлбэр')}<div class="fa-formats">${t.format.map((f) => `<span class="fa-format">${f === 'online' ? '💻 Онлайн' : '🏢 Биечлэн'}</span>`).join('')}</div>`, 'fa-mb-lg')}
-    ${btn('Цаг захиалах хүсэлт илгээх →', 'goto', { val: 'booking-request' })}`;
+    ${card(`${label('Уулзалтын хэлбэр')}<div class="fa-formats">${t.format.map((f) => `<button type="button" class="fa-format${s.format === f ? ' selected' : ''}" data-act="format" data-val="${f}">${f === 'online' ? '💻 Онлайн' : '🏢 Биечлэн'}</button>`).join('')}</div>${locationSelected ? `<p class="fa-selected-location">📍 ${esc(s.aimag)}, ${esc(s.district)}</p>` : ''}`, 'fa-mb-lg')}
+    ${btn(canBook ? 'Цаг захиалах →' : 'Байршил сонгох →', 'goto', { val: canBook ? 'therapist-availability' : 'profile-location', disabled: !s.format })}`;
+  };
+
+  const profileLocationScreen = (t) => {
+    const districts = s.aimag === 'Улаанбаатар' ? UB_DISTRICTS : OTHER_DISTRICTS;
+    return `
+      ${backLink('profile')}
+      <div class="fa-head">
+        ${title('Байршлаа<br /><em class="sage">сонгоно уу</em>')}
+        <p class="fa-sub sm">${esc(t.name)}-тэй биечлэн уулзах байршлыг сонгоно уу</p>
+      </div>
+      ${card(`${label('Аймаг / Нийслэл')}<div class="fa-chips fa-chips-sm">${AIMAGS.map((a) => `<button type="button" class="fa-chip fa-chip-sm${s.aimag === a ? ' selected earth' : ''}" data-act="aimag" data-val="${esc(a)}">${esc(a)}</button>`).join('')}</div>`, 'fa-mb')}
+      ${s.aimag ? card(`${label(s.aimag === 'Улаанбаатар' ? 'Дүүрэг' : 'Сум / Дүүрэг')}<div class="fa-chips fa-chips-sm">${districts.map((d) => `<button type="button" class="fa-chip fa-chip-sm${s.district === d ? ' selected warm' : ''}" data-act="district" data-val="${esc(d)}">${esc(d)}</button>`).join('')}</div>`, 'fa-mb-lg') : ''}
+      ${btn('Байршлыг баталгаажуулах →', 'goto', { val: 'profile', disabled: !s.aimag || !s.district })}`;
+  };
 
   const requestScreen = (t) => `
       ${backLink('profile')}
@@ -547,6 +575,7 @@
     if (!t) return '';
     switch (s.screen) {
       case 'profile': return profileScreen(t);
+      case 'profile-location': return profileLocationScreen(t);
       case 'booking-request': return requestScreen(t);
       case 'therapist-availability': return availabilityScreen(t);
       case 'client-select-time': return selectTimeScreen(t);
@@ -653,7 +682,11 @@
     },
     prev: () => { s.step = Math.max(0, s.step - 1); },
     reset,
-    goto: (v) => { s.screen = v; s.error = ''; },
+    goto: (v) => {
+      if (v === 'therapist-availability' && s.therapist && s.slots.length === 0) s.slots = buildSlots(s.therapist, new Set());
+      s.screen = v;
+      s.error = '';
+    },
     offer: (v) => { s.offered = toggle(s.offered, v); },
     'pick-slot': (v) => { s.selectedSlot = s.slots.find((slot) => slot.key === v) || null; },
     adjust: (v) => {

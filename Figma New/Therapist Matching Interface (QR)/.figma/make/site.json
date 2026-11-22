@@ -1,0 +1,10 @@
+{
+  "description": "Connects users with specialized therapists based on selected mental health topics, preferences, and location for personalized in-person or online support.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

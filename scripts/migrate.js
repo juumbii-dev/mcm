@@ -1,6 +1,19 @@
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
+
+function loadLocalEnvironment() {
+  const envPath = path.join(__dirname, '..', '.env.local');
+  if (!fsSync.existsSync(envPath)) return;
+  for (const line of fsSync.readFileSync(envPath, 'utf8').split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!match || process.env[match[1]]) continue;
+    process.env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, '$2');
+  }
+}
+
+loadLocalEnvironment();
 
 async function migrate() {
   if (!process.env.DATABASE_URL) {
