@@ -3,11 +3,7 @@ import type { Access, CollectionConfig, Where } from "payload"
 const isAdmin = (user: { collection?: string } | null | undefined) =>
   user?.collection === "admins"
 
-const ownerOrAdmin: Access = ({ req }) => {
-  if (isAdmin(req.user)) return true
-  if (req.user?.collection !== "users") return false
-  return { owner: { equals: req.user.id } }
-}
+const isPayloadAdmin: Access = ({ req }) => isAdmin(req.user)
 
 const specializationOptions = [
   "Харилцааны бэрхшээл",
@@ -50,27 +46,10 @@ export const TherapistProfiles: CollectionConfig = {
     plural: "Зөвлөхийн профайлууд",
   },
   access: {
-    create: ({ req }) => req.user?.collection === "users",
+    // Нэвтрэлт нь Node серверийн users хүснэгтэд байдаг тул Payload дээр зөвхөн admin бичнэ
+    create: isPayloadAdmin,
     read: ({ req }) => {
       if (isAdmin(req.user)) return true
-      if (req.user?.collection === "users") {
-        return {
-          or: [
-            {
-              and: [
-                { status: { equals: "approved" } },
-                {
-                  or: [
-                    { isVisible: { equals: true } },
-                    { isVisible: { exists: false } },
-                  ],
-                },
-              ],
-            },
-            { owner: { equals: req.user.id } },
-          ],
-        } as Where
-      }
       return {
         and: [
           { status: { equals: "approved" } },
@@ -83,8 +62,8 @@ export const TherapistProfiles: CollectionConfig = {
         ],
       } as Where
     },
-    update: ownerOrAdmin,
-    delete: ({ req }) => isAdmin(req.user),
+    update: isPayloadAdmin,
+    delete: isPayloadAdmin,
     admin: ({ req }) => isAdmin(req.user),
   },
   admin: {
@@ -98,38 +77,27 @@ export const TherapistProfiles: CollectionConfig = {
       "updatedAt",
     ],
   },
-  hooks: {
-    beforeChange: [
-      ({ data, operation, req }) => {
-        if (operation === "create" && req.user?.collection === "users") {
-          data.owner = req.user.id
-          data.status = "pending"
-          data.isVisible = false
-        }
-        return data
-      },
-    ],
-  },
   fields: [
     {
-      name: "owner",
-      type: "relationship",
-      relationTo: "users",
+      name: "ownerUserId",
+      label: "Node users.id",
+      type: "number",
       unique: true,
       index: true,
-      access: {
-        create: () => false,
-        read: ({ req, doc }) =>
-          isAdmin(req.user) ||
-          (req.user?.collection === "users" &&
-            (typeof doc?.owner === "object"
-              ? doc.owner?.id === req.user.id
-              : doc?.owner === req.user.id)),
-        update: () => false,
-      },
       admin: {
         position: "sidebar",
-        description: "Starter профайлууд эзэмшигчгүй байж болно.",
+        description: "Энэ профайлтай холбогдох Node серверийн нэвтрэлтийн хэрэглэгчийн ID.",
+      },
+    },
+    {
+      name: "legacyPsychologistId",
+      label: "Node psychologists.id",
+      type: "number",
+      unique: true,
+      index: true,
+      admin: {
+        position: "sidebar",
+        description: "Node серверийн psychologists хүснэгтийн анхны ID (захиалгын холбоос).",
       },
     },
     {
@@ -168,6 +136,14 @@ export const TherapistProfiles: CollectionConfig = {
     },
     { name: "name", type: "text", required: true, index: true },
     {
+      name: "legacyFocus",
+      label: "Node-ийн анхны мэргэжлийн чиглэл (текст)",
+      type: "textarea",
+      admin: {
+        description: "Node-оос шилжсэн эх текст. Сонголтод багтаагүй утгууд энд хадгалагдана.",
+      },
+    },
+    {
       name: "photo",
       type: "upload",
       relationTo: "media",
@@ -183,7 +159,6 @@ export const TherapistProfiles: CollectionConfig = {
             { label: "Эрэгтэй", value: "male" },
             { label: "Бусад", value: "other" },
           ],
-          required: true,
         },
         { name: "age", type: "number", min: 20, max: 90 },
         {
@@ -193,12 +168,11 @@ export const TherapistProfiles: CollectionConfig = {
         },
       ],
     },
-    { name: "professionalTitle", type: "text", required: true },
-    { name: "bio", type: "textarea", required: true },
+    { name: "professionalTitle", type: "text" },
+    { name: "bio", type: "textarea" },
     {
       name: "education",
       type: "array",
-      minRows: 1,
       fields: [
         { name: "school", type: "text", required: true },
         { name: "degree", type: "text", required: true },
@@ -232,7 +206,6 @@ export const TherapistProfiles: CollectionConfig = {
       name: "categories",
       type: "select",
       hasMany: true,
-      required: true,
       options: [
         { label: "Хувь хүний зөвлөгөө", value: "personal" },
         { label: "Хосын харилцааны зөвлөгөө", value: "couples" },
@@ -245,14 +218,12 @@ export const TherapistProfiles: CollectionConfig = {
       name: "specializations",
       type: "select",
       hasMany: true,
-      required: true,
       options: specializationOptions,
     },
     {
       name: "format",
       type: "select",
       hasMany: true,
-      required: true,
       options: [
         { label: "Онлайн", value: "online" },
         { label: "Биечлэн", value: "inperson" },

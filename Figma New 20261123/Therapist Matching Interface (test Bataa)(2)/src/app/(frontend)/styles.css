@@ -1,0 +1,43 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", serif;
+  --font-body: "Nunito", sans-serif;
+  --color-cream: #f7f3ee;
+  --color-stone: #e8e0d5;
+  --color-warm: #c8a882;
+  --color-earth: #8b6f52;
+  --color-sage: #7a9e8e;
+  --color-sage-light: #e8f0ec;
+  --color-text: #2d2620;
+  --color-muted: #8a7968;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.figma-custom-code-fragment {
+  display: contents;
+}
+
+.figma-bypass-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 2147483647;
+  transform: translateY(-150%);
+  border-radius: 6px;
+  background: #111827;
+  color: #fff;
+  padding: 8px 12px;
+  font: 600 14px/1.2 system-ui, sans-serif;
+  text-decoration: none;
+}
+
+.figma-bypass-link:focus {
+  transform: translateY(0);
+}

@@ -1,4 +1,6 @@
-const { initDatabase, findUserById, listUsers, updateUser, deleteUser } = require('../lib/db');
+const { initDatabase, findUserById, listUsers, listPsychologists, updatePsychologist, updateUser, deleteUser, createUser, hashPassword, findUserByEmail } = require('../lib/db');
+
+const PSYCHOLOGIST_STATUSES = ['pending', 'needs-info', 'approved', 'rejected'];
 
 async function handleAdmin(req, res) {
   await initDatabase();
@@ -20,15 +22,9 @@ async function handleAdmin(req, res) {
     }
 
     const users = await listUsers();
+    const counselors = await listPsychologists({ includeInactive: true });
     res.statusCode = 200;
-    res.end(JSON.stringify({ users: users.map((user) => ({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      isAdmin: user.isAdmin,
-    })) }));
+    res.end(JSON.stringify({ users, counselors }));
     return;
   }
 
@@ -56,6 +52,54 @@ async function handleAdmin(req, res) {
     req.on('end', async () => {
       try {
         const data = JSON.parse(body || '{}');
+        if (data.action === 'createAdmin') {
+          const name = String(data.name || '').trim();
+          const email = String(data.email || '').trim().toLowerCase();
+          const password = String(data.password || '');
+          if (!name || !email || password.length < 8) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Нэр, имэйл болон хамгийн багадаа 8 тэмдэгттэй нууц үг шаардлагатай' }));
+            return;
+          }
+          if (await findUserByEmail(email)) {
+            res.statusCode = 409;
+            res.end(JSON.stringify({ error: 'Энэ имэйлээр account бүртгэлтэй байна' }));
+            return;
+          }
+          const user = await createUser({
+            name,
+            email,
+            role: 'admin',
+            isActive: true,
+            isAdmin: true,
+            passwordHash: hashPassword(password),
+          });
+          res.statusCode = 201;
+          res.end(JSON.stringify({ ok: true, user }));
+          return;
+        }
+
+        if (data.psychologistId !== undefined) {
+          const status = data.status === undefined ? undefined : String(data.status);
+          if (status !== undefined && !PSYCHOLOGIST_STATUSES.includes(status)) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Invalid status' }));
+            return;
+          }
+          const psychologist = await updatePsychologist(data.psychologistId, {
+            status,
+            isVisible: data.isVisible,
+          });
+          if (!psychologist) {
+            res.statusCode = 404;
+            res.end(JSON.stringify({ error: 'Counselor not found' }));
+            return;
+          }
+          res.statusCode = 200;
+          res.end(JSON.stringify({ ok: true, counselor: psychologist }));
+          return;
+        }
+
         const userId = Number(data.id);
         if (!userId) {
           res.statusCode = 400;

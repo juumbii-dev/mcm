@@ -268,7 +268,7 @@
         </button>`).join('')}
     </div>
     <button type="button" class="fa-continue" data-act="next"${s.category ? '' : ' disabled'}>Үргэлжлүүлэх →</button>
-    <p class="fa-therapist-link">Та зөвлөх үү? <a href="therapist-signup">Зөвлөхөөр бүртгүүлэх</a></p>
+    <p class="fa-therapist-link">Та зөвлөх үү? <a href="therapist-signup">Зөвлөхөөр бүртгүүлэх</a> <span aria-hidden="true">·</span> <a href="therapist-login">Зөвлөхөөр нэвтрэх</a></p>
     <a class="fa-chat-card" href="chat">
       <strong>Зөвлөхтэй чатлах</strong>
       <span>Chatbot-оор зөвлөх сонгох эсвэл шууд чат эхлүүлэх</span>

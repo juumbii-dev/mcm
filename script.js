@@ -715,11 +715,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const counselorTable = document.getElementById('admin-counselor-list');
     const clientTable = document.getElementById('admin-client-list');
+    const adminCreateForm = document.getElementById('admin-create-form');
+    const adminCreateMessage = document.getElementById('admin-create-message');
 
+    adminCreateForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(adminCreateForm);
+      const response = await fetch(`${apiBase}/api/admin/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${stored.token}` },
+        body: JSON.stringify({
+          action: 'createAdmin',
+          name: formData.get('name'),
+          email: formData.get('email'),
+          password: formData.get('password'),
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      adminCreateMessage.textContent = response.ok
+        ? 'Шинэ admin account амжилттай үүслээ.'
+        : (result.error || 'Admin account үүсгэхэд алдаа гарлаа.');
+      if (response.ok) adminCreateForm.reset();
+    });
+
+    const escapeHtml = (value) => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
     const renderUserRow = (user) => `
       <tr>
-        <td><input type="text" data-name-field="${user.id}" value="${(user.name || '').replace(/"/g, '&quot;')}" /></td>
-        <td><input type="email" data-email-field="${user.id}" value="${(user.email || '').replace(/"/g, '&quot;')}" /></td>
+        <td>
+          <input type="text" data-name-field="${user.id}" value="${escapeHtml(user.name)}" />
+          <small>${escapeHtml(user.phone || 'Утас оруулаагүй')}</small>
+        </td>
+        <td>
+          <input type="email" data-email-field="${user.id}" value="${escapeHtml(user.email)}" />
+          <small>${escapeHtml(user.city || 'Хот оруулаагүй')}</small>
+        </td>
+        <td>
+          <small>Мэргэшил: ${escapeHtml(user.expertise || 'Оруулаагүй')}</small><br />
+          <small>Туршлага: ${escapeHtml(user.experience || 0)} жил</small><br />
+          <small>Боловсрол: ${escapeHtml(user.qualifications || 'Оруулаагүй')}</small><br />
+          <small>Хүйс/нас: ${escapeHtml(user.gender || 'Оруулаагүй')} / ${escapeHtml(user.age || 'Оруулаагүй')}</small><br />
+          <small>Мэргэжил: ${escapeHtml(user.profession || 'Оруулаагүй')}</small><br />
+          <small>Гэр бүлийн байдал: ${escapeHtml(user.maritalStatus || 'Оруулаагүй')}</small><br />
+          <small>Сонирхол: ${escapeHtml(user.interests || 'Оруулаагүй')}</small><br />
+          <small>Асуудлын чиглэл: ${escapeHtml(user.issues || 'Оруулаагүй')}</small><br />
+          <small>Танилцуулга: ${escapeHtml(user.bio || 'Оруулаагүй')}</small>
+        </td>
         <td>
           <label style="display:flex;align-items:center;gap:0.5rem;">
             <input type="checkbox" data-active-field="${user.id}" ${user.isActive ? 'checked' : ''} />
@@ -740,8 +784,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       const result = await response.json();
       if (!response.ok) {
-        counselorTable.innerHTML = `<tr><td colspan="4"><p>Ошибка: ${result.error || 'Не удалось загрузить пользователей'}</p></td></tr>`;
-        clientTable.innerHTML = `<tr><td colspan="4"><p>Ошибка: ${result.error || 'Не удалось загрузить пользователей'}</p></td></tr>`;
+        counselorTable.innerHTML = `<tr><td colspan="5"><p>Ошибка: ${result.error || 'Не удалось загрузить пользователей'}</p></td></tr>`;
+        clientTable.innerHTML = `<tr><td colspan="5"><p>Ошибка: ${result.error || 'Не удалось загрузить пользователей'}</p></td></tr>`;
         return;
       }
 
@@ -751,10 +795,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       counselorTable.innerHTML = counselors.length
         ? counselors.map(renderUserRow).join('')
-        : '<tr><td colspan="4">Зөвлөх байхгүй байна.</td></tr>';
+        : '<tr><td colspan="5">Зөвлөх байхгүй байна.</td></tr>';
       clientTable.innerHTML = clients.length
         ? clients.map(renderUserRow).join('')
-        : '<tr><td colspan="4">Үйлчлүүлэгч байхгүй байна.</td></tr>';
+        : '<tr><td colspan="5">Үйлчлүүлэгч байхгүй байна.</td></tr>';
 
       document.querySelectorAll('.admin-save').forEach((button) => {
         button.addEventListener('click', async () => {

@@ -32,6 +32,17 @@
         <h1 class="page-title">Хэрэглэгчийн удирдлага</h1>
         <p class="page-subtitle">Зөвлөх болон үйлчлүүлэгчийн account-ийг тусад нь удирдах боломжтой.</p>
 
+        <form id="admin-create-form" class="form-card" style="margin-top:1.5rem; padding:1.25rem;">
+          <h2>Шинэ admin account үүсгэх</h2>
+          <div class="form-grid">
+            <label>Нэр<input name="name" required /></label>
+            <label>Имэйл<input name="email" type="email" required /></label>
+            <label>Нууц үг<input name="password" type="password" minlength="8" required /></label>
+          </div>
+          <button class="btn btn-primary" type="submit">Admin үүсгэх</button>
+          <p id="admin-create-message" class="form-link" role="status"></p>
+        </form>
+
         <div style="display:grid; gap:1.5rem; margin-top:1.5rem;">
           <div>
             <h2 style="margin-bottom: 0.75rem;">Зөвлөхүүд</h2>
@@ -40,6 +51,7 @@
                 <tr>
                   <th style="text-align:left; padding:0.5rem;">Нэр</th>
                   <th style="text-align:left; padding:0.5rem;">Имэйл</th>
+                  <th style="text-align:left; padding:0.5rem;">Дэлгэрэнгүй мэдээлэл</th>
                   <th style="text-align:left; padding:0.5rem;">Төлөв</th>
                   <th style="text-align:left; padding:0.5rem;">Үйлдэл</th>
                 </tr>
@@ -55,6 +67,7 @@
                 <tr>
                   <th style="text-align:left; padding:0.5rem;">Нэр</th>
                   <th style="text-align:left; padding:0.5rem;">Имэйл</th>
+                  <th style="text-align:left; padding:0.5rem;">Дэлгэрэнгүй мэдээлэл</th>
                   <th style="text-align:left; padding:0.5rem;">Төлөв</th>
                   <th style="text-align:left; padding:0.5rem;">Үйлдэл</th>
                 </tr>

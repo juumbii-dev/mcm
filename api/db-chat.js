@@ -6,10 +6,13 @@ const {
   listChatMessages,
   createChatMessage,
 } = require('../lib/db');
+const { verifyGuestToken } = require('../lib/guest-chat');
 
 function getTokenUserId(req) {
   const authHeader = req.headers && (req.headers.authorization || req.headers.Authorization) || '';
-  const match = String(authHeader).match(/^Bearer\s+token-(\d+)$/);
+  const cookie = String(req.headers.cookie || '').match(/(?:^|;\s*)app-session=([^;]+)/);
+  const match = String(authHeader).match(/^Bearer\s+token-(\d+)$/) ||
+    (cookie && String(decodeURIComponent(cookie[1])).match(/^token-(\d+)$/));
   return match ? Number(match[1]) : null;
 }
 
@@ -17,6 +20,12 @@ function sendJson(res, status, data) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.end(JSON.stringify(data));
+}
+
+function getGuestToken(req) {
+  const header = req.headers && (req.headers['x-guest-token'] || req.headers['X-Guest-Token']);
+  const cookie = String(req.headers.cookie || '').match(/(?:^|;\s*)guest-chat-token=([^;]+)/);
+  return String(header || (cookie && decodeURIComponent(cookie[1])) || '');
 }
 
 async function handleChat(req, res) {
@@ -35,11 +44,14 @@ async function handleChat(req, res) {
   }
 
   if (req.method === 'GET' && conversationId) {
-    if (!userId || !(await findUserById(userId))) {
+    const guest = !userId && verifyGuestToken(getGuestToken(req), conversationId);
+    if ((!userId || !(await findUserById(userId))) && !guest) {
       sendJson(res, 401, { error: 'Нэвтрэх шаардлагатай' });
       return;
     }
-    const result = await listChatMessages(Number(conversationId), userId);
+    const result = await listChatMessages(Number(conversationId), userId, {
+      allowGuest: guest,
+    });
     if (!result) {
       sendJson(res, 404, { error: 'Яриа олдсонгүй' });
       return;
@@ -74,7 +86,8 @@ async function handleChat(req, res) {
   }
 
   if (req.method === 'POST' && conversationId) {
-    if (!userId || !(await findUserById(userId))) {
+    const guest = !userId && verifyGuestToken(getGuestToken(req), conversationId);
+    if ((!userId || !(await findUserById(userId))) && !guest) {
       sendJson(res, 401, { error: 'Realtime chat ашиглана уу' });
       return;
     }
@@ -84,7 +97,9 @@ async function handleChat(req, res) {
       try {
         const data = JSON.parse(body || '{}');
         const text = String(data.body || '').trim();
-        const conversation = await listChatMessages(Number(conversationId), userId);
+        const conversation = await listChatMessages(Number(conversationId), userId, {
+          allowGuest: guest,
+        });
         if (!conversation) {
           sendJson(res, 404, { error: 'Яриа олдсонгүй' });
           return;
@@ -95,7 +110,7 @@ async function handleChat(req, res) {
         }
         const message = await createChatMessage({
           conversationId: Number(conversationId),
-          senderId: userId,
+          senderId: guest ? null : userId,
           body: text,
         });
         sendJson(res, 201, { message });

@@ -1,5 +1,6 @@
 import path from 'path'
-import { buildFigmaConfig } from '@payloadcms/figma'
+import { buildConfig } from 'payload'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { en as adminLanguage } from '@payloadcms/translations/languages/en'
 import { fileURLToPath } from 'url'
@@ -17,7 +18,17 @@ import { ClientFeedback } from './collections/ClientFeedback'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-export default buildFigmaConfig({
+if (!process.env.PAYLOAD_SECRET) {
+  throw new Error('PAYLOAD_SECRET environment variable is required')
+}
+
+export default buildConfig({
+  secret: process.env.PAYLOAD_SECRET,
+  db: postgresAdapter({
+    pool: { connectionString: process.env.DATABASE_URL },
+    // Payload хүснэгтүүдийг Node серверийн public.users / psychologists-ээс тусгаарлана
+    schemaName: 'payload',
+  }),
   admin: {
     user: Admins.slug,
     constrainWidth: true,
@@ -57,5 +68,4 @@ export default buildFigmaConfig({
     defaultLocale: 'en',
   },
   plugins: [mcpPlugin({})],
-  figma: {},
 })

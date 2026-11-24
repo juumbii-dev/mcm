@@ -1,4 +1,4 @@
-const { initDatabase, hashPassword, findUserByEmail, createUser, findUserByCredentials, updateUser } = require('../lib/db');
+const { initDatabase, hashPassword, findUserByEmail, createUser, syncCounselorProfiles, findUserByCredentials, updateUser } = require('../lib/db');
 
 const { findUserById } = require('../lib/db');
 
@@ -40,6 +40,11 @@ async function handleAuth(req, res) {
           res.end(JSON.stringify({ error: 'Name, email and password are required' }));
           return;
         }
+        if (role === 'admin') {
+          res.statusCode = 403;
+          res.end(JSON.stringify({ error: 'Admin account-ийг одоо байгаа админ үүсгэнэ' }));
+          return;
+        }
 
         const normalizedEmail = email.toLowerCase();
         const existing = await findUserByEmail(normalizedEmail);
@@ -67,8 +72,10 @@ async function handleAuth(req, res) {
           marital_status: marital_status || null,
           interests: interests || null,
           issues: issues || null,
+          isActive: role !== 'counselor',
           passwordHash: hashPassword(password),
         });
+        if (role === 'counselor') await syncCounselorProfiles();
 
         res.statusCode = 201;
         res.end(JSON.stringify({ user, token: `token-${user.id}` }));

@@ -21,6 +21,7 @@ const handleBookings = require('./api/db-bookings');
 const handlePsychologists = require('./api/db-psychologists');
 const handleTherapistProfiles = require('./api/db-therapist-profiles');
 const handleChat = require('./api/db-chat');
+const handleFeedback = require('./api/db-feedback');
 const handleAblyToken = require('./api/ably-token');
 
 const port = process.env.PORT || 8000;
@@ -86,6 +87,11 @@ const server = http.createServer(async (req, res) => {
 
   if (url.pathname === '/api/chat' || url.pathname.startsWith('/api/chat/')) {
     await handleChat(req, res);
+    return;
+  }
+
+  if (url.pathname === '/api/feedback') {
+    await handleFeedback(req, res);
     return;
   }
 

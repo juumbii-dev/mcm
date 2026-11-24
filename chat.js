@@ -31,7 +31,7 @@
       const specialty = document.getElementById('chat-specialty').value;
       const items = allTherapists.filter((item) => {
         const profile = profiles[item.name] || {};
-        return (!category || profile.categories?.includes(category)) && (!specialty || profile.specialties?.includes(specialty));
+        return (!category || !profile.categories || profile.categories.includes(category)) && (!specialty || !profile.specialties || profile.specialties.includes(specialty));
       });
       document.querySelector('.chat-list-label').textContent = `${items.length} ЗӨВЛӨХ ОЛДЛОО`;
       therapists.innerHTML = items.length ? items.map((item) => {
@@ -50,9 +50,9 @@
       therapists.querySelectorAll('[data-detail-id]').forEach((button) => button.addEventListener('click', () => showProfile(button.dataset.detailId)));
     };
     fetch(`${apiBase}/api/psychologists`).then((response) => response.json()).then((items) => {
-      allTherapists = items.filter((item) => profiles[item.name]);
+      allTherapists = items;
       const specialtySelect = document.getElementById('chat-specialty');
-      [...new Set(allTherapists.flatMap((item) => profiles[item.name].specialties))].forEach((specialty) => specialtySelect.insertAdjacentHTML('beforeend', `<option value="${esc(specialty)}">${esc(specialty)}</option>`));
+      [...new Set(allTherapists.flatMap((item) => profiles[item.name]?.specialties || [item.focus || item.specialty].filter(Boolean)))].forEach((specialty) => specialtySelect.insertAdjacentHTML('beforeend', `<option value="${esc(specialty)}">${esc(specialty)}</option>`));
       render();
     }).catch(() => { therapists.innerHTML = '<p class="chat-empty">Зөвлөхийн мэдээлэл ачаалж чадсангүй.</p>'; });
     ['chat-category', 'chat-specialty', 'chat-day', 'chat-time'].forEach((id) => document.getElementById(id).addEventListener('change', render));

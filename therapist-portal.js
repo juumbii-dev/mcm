@@ -69,16 +69,36 @@
 
   const admin = document.getElementById('admin-dashboard');
   if (admin) {
-    request('/api/admin/users').then(({ users }) => {
-      const rows = users.filter((user) => user.role === 'counselor');
-      admin.querySelector('#admin-application-list').innerHTML = rows.length ? rows.map((user) => `
-        <article class="info-card" style="margin-top:1rem"><h3>${user.name}</h3><p>${user.email}</p>
-        <p>Төлөв: ${user.isActive ? 'Идэвхтэй' : 'Идэвхгүй'}</p>
-        <button class="btn btn-secondary" data-user-id="${user.id}" data-active="${!user.isActive}">${user.isActive ? 'Идэвхгүй болгох' : 'Батлах'}</button></article>`).join('') : '<p class="empty-state">Одоогоор хүсэлт алга.</p>';
-      admin.querySelectorAll('[data-user-id]').forEach((button) => button.addEventListener('click', async () => {
-        await request('/api/admin/users', { method: 'POST', body: JSON.stringify({ id: Number(button.dataset.userId), isActive: button.dataset.active === 'true' }) });
+    const statusLabels = { approved: 'Баталгаажсан', pending: 'Хүлээгдэж буй', 'needs-info': 'Нэмэлт мэдээлэл хэрэгтэй', rejected: 'Татгалзсан' };
+    const formatUpdatedAt = (value) => (value ? new Date(value).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—');
+    request('/api/admin/users').then(({ counselors = [] }) => {
+      const list = admin.querySelector('#admin-application-list');
+      if (!counselors.length) {
+        list.innerHTML = '<p class="empty-state">Одоогоор зөвлөх бүртгэл алга.</p>';
+        return;
+      }
+      list.innerHTML = `
+        <table style="width:100%;border-collapse:collapse;margin-top:1rem">
+          <thead><tr style="text-align:left;border-bottom:1px solid #444">
+            <th style="padding:.6rem">Нэр</th><th style="padding:.6rem">Статус</th><th style="padding:.6rem">Сайтад идэвхтэй харагдах</th><th style="padding:.6rem">Туршлага</th><th style="padding:.6rem">Шинэчлэгдсэн огноо</th>
+          </tr></thead>
+          <tbody>${counselors.map((counselor) => `
+            <tr style="border-bottom:1px solid #333">
+              <td style="padding:.6rem"><strong>${counselor.name}</strong></td>
+              <td style="padding:.6rem"><select data-status-id="${counselor.id}">${Object.entries(statusLabels).map(([value, label]) => `<option value="${value}" ${counselor.status === value ? 'selected' : ''}>${label}</option>`).join('')}</select></td>
+              <td style="padding:.6rem"><input type="checkbox" data-visible-id="${counselor.id}" ${counselor.isVisible ? 'checked' : ''}></td>
+              <td style="padding:.6rem">${counselor.experience || 0}</td>
+              <td style="padding:.6rem">${formatUpdatedAt(counselor.updated_at)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+
+      const save = async (id, payload) => {
+        await request('/api/admin/users', { method: 'POST', body: JSON.stringify({ psychologistId: Number(id), ...payload }) });
         window.location.reload();
-      }));
+      };
+      list.querySelectorAll('[data-status-id]').forEach((select) => select.addEventListener('change', () => save(select.dataset.statusId, { status: select.value })));
+      list.querySelectorAll('[data-visible-id]').forEach((input) => input.addEventListener('change', () => save(input.dataset.visibleId, { isVisible: input.checked })));
     }).catch((error) => { admin.querySelector('#admin-application-list').textContent = error.message; });
   }
 })();
