@@ -37,7 +37,12 @@
           <label>Имэйл<input type="email" name="email" id="profile-email" required /></label>
           <label>Утас<input type="tel" name="phone" id="profile-phone" /></label>
           <label>Товч танилцуулга<textarea name="bio" id="profile-bio" rows="4"></textarea></label>
-          <label>Шинэ нууц үг (хэрэв өөрчлөв) <input type="password" name="password" id="profile-password" /></label>
+          <fieldset>
+            <legend>Нууц үг солих (заавал биш)</legend>
+            <label>Одоогийн нууц үг <input type="password" id="profile-current-password" autocomplete="current-password" /></label>
+            <label>Шинэ нууц үг <input type="password" id="profile-password" autocomplete="new-password" minlength="8" /></label>
+            <label>Шинэ нууц үг давтах <input type="password" id="profile-password-confirm" autocomplete="new-password" minlength="8" /></label>
+          </fieldset>
           <div id="counselor-fields" style="display:none;">
             <label>Туршлага (жил) <input type="number" name="experience" id="profile-experience" min="0" /></label>
             <label>Мэргэжил/Салбар <input type="text" name="expertise" id="profile-expertise" /></label>

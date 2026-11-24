@@ -79,6 +79,25 @@ async function handleAdmin(req, res) {
           return;
         }
 
+        if (data.action === 'changePassword') {
+          const targetId = Number(data.id);
+          const newPassword = typeof data.newPassword === 'string' ? data.newPassword : '';
+          if (!targetId || newPassword.length < 8 || newPassword.length > 72) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Хэрэглэгчийн дугаар болон 8-72 тэмдэгттэй шинэ нууц үг шаардлагатай' }));
+            return;
+          }
+          const user = await updateUser(targetId, { passwordHash: hashPassword(newPassword) });
+          if (!user) {
+            res.statusCode = 404;
+            res.end(JSON.stringify({ error: 'Хэрэглэгч олдсонгүй' }));
+            return;
+          }
+          res.statusCode = 200;
+          res.end(JSON.stringify({ ok: true, user }));
+          return;
+        }
+
         if (data.psychologistId !== undefined) {
           const status = data.status === undefined ? undefined : String(data.status);
           if (status !== undefined && !PSYCHOLOGIST_STATUSES.includes(status)) {

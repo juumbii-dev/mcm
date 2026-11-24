@@ -1,0 +1,185 @@
+/*
+ * Therapist Profiles collection presentation overrides.
+ * The active-navigation selectors keep the dark treatment scoped to this
+ * collection instead of changing other Payload collections.
+ */
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]),
+body:has(a[href*="/admin/collections/therapist-profiles"].active),
+body:has(.collection-list__header a[href*="therapist-profiles"]) {
+  --theme-bg: #0b1118;
+  --theme-elevation-0: #111923;
+  --theme-elevation-50: #17212d;
+  --theme-elevation-100: #1d2a37;
+  --theme-elevation-150: #243443;
+  --theme-elevation-200: #2b3d4d;
+  --theme-text: #e7eef5;
+  --theme-text-dim: #91a2b3;
+  --theme-border-color: #2b3d4d;
+  --theme-success-500: #58c79a;
+  background: #0b1118;
+  color: #e7eef5;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .template-default,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .template-default,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .template-default {
+  background: #0b1118;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .nav,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .nav,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .nav {
+  background: #0f1721;
+  border-right-color: #263746;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .nav a,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .nav a,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .nav a {
+  color: #91a2b3;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .nav a:hover,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .nav a:hover,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .nav a:hover {
+  background: #1b2a38;
+  color: #f5f9fc;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .nav a[aria-current="page"],
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .nav a.active,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .nav a[href*="therapist-profiles"] {
+  background: #20394a;
+  box-shadow: inset 3px 0 #62d2a2;
+  color: #f5f9fc;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .collection-list,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .collection-list,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .collection-list {
+  color: #e7eef5;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .collection-list__header,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .collection-list__header,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .collection-list__header {
+  border-bottom: 1px solid #2b3d4d;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .collection-list__header h1,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .collection-list__header h1,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .collection-list__header h1 {
+  color: #f5f9fc;
+  letter-spacing: -0.02em;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .list-controls,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .list-controls,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .list-controls {
+  align-items: center;
+  background: #111923;
+  border: 1px solid #2b3d4d;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 18%);
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 10px;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .list-controls input,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .list-controls input,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .list-controls input,
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .list-controls select,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .list-controls select,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .list-controls select {
+  background: #0b1118;
+  border-color: #385064;
+  color: #e7eef5;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .table,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .table,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .table {
+  background: #111923;
+  border: 1px solid #2b3d4d;
+  border-radius: 12px;
+  box-shadow: 0 18px 48px rgb(0 0 0 / 22%);
+  overflow: hidden;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .table thead,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .table thead,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .table thead {
+  background: #1a2734;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .table th,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .table th,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .table th {
+  border-bottom: 1px solid #385064;
+  color: #9fb3c5;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 14px 16px;
+  text-transform: uppercase;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .table tbody tr,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .table tbody tr,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .table tbody tr {
+  background: #111923;
+  border-bottom: 1px solid #263746;
+  transition: background 140ms ease;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .table tbody tr:nth-child(even),
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .table tbody tr:nth-child(even),
+body:has(.collection-list__header a[href*="therapist-profiles"]) .table tbody tr:nth-child(even) {
+  background: #101a25;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .table tbody tr:hover,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .table tbody tr:hover,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .table tbody tr:hover {
+  background: #1b2a38;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .table td,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .table td,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .table td {
+  border-bottom-color: #263746;
+  color: #d7e1ea;
+  padding: 15px 16px;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .table a,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .table a,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .table a {
+  color: #72d6aa;
+  font-weight: 600;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .status,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .status,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .status {
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 4px 9px;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) .paginator,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) .paginator,
+body:has(.collection-list__header a[href*="therapist-profiles"]) .paginator {
+  border-top: 1px solid #2b3d4d;
+  color: #91a2b3;
+  padding-top: 16px;
+}
+
+body:has(a[href*="/admin/collections/therapist-profiles"][aria-current="page"]) button,
+body:has(a[href*="/admin/collections/therapist-profiles"].active) button,
+body:has(.collection-list__header a[href*="therapist-profiles"]) button {
+  border-radius: 7px;
+}

@@ -1,5 +1,8 @@
 import Link from "next/link"
 import AdminApplicationActions from "@/components/AdminApplicationActions"
+import AdminPasswordReset from "@/components/AdminPasswordReset"
+import CreateAdminForm from "@/components/CreateAdminForm"
+import { logoutAdmin } from "./actions"
 import { getCurrentCMSAdmin } from "@/lib/admin-auth"
 import { legacyAuthenticatedRequest } from "@/lib/legacy-api"
 
@@ -35,7 +38,7 @@ export default async function AdminDashboardPage() {
             зөвшөөрнө үү.
           </p>
           <Link
-            href="/admin"
+            href="/admin-login"
             className="mt-7 block rounded-full bg-[#55796a] px-6 py-3.5 text-center text-sm font-bold text-white transition hover:bg-[#46675a]"
           >
             Админ системд нэвтрэх
@@ -52,8 +55,13 @@ export default async function AdminDashboardPage() {
   }
 
   const result = await legacyAuthenticatedRequest<{
+    users: Array<Record<string, unknown>>
     counselors: Array<Record<string, unknown>>
   }>("/admin/users")
+  const adminUsers = result.users.filter(
+    (user) => user.role === "admin" || user.isAdmin === true,
+  )
+  const allUsers = result.users
   const applications = result.counselors.map((counselor) => ({
     ...counselor,
     status: String(counselor.status || "pending"),
@@ -88,12 +96,14 @@ export default async function AdminDashboardPage() {
               Сэтгэлзүйч
             </span>
           </Link>
-          <Link
-            href="/admin"
-            className="rounded-full border border-[#d9c7b2] px-4 py-2 text-sm font-bold text-[#6f543c] transition hover:bg-[#f7f3ee]"
-          >
-            Админ нэвтрэлт
-          </Link>
+          <form action={logoutAdmin}>
+            <button
+              type="submit"
+              className="rounded-full border border-[#d9c7b2] px-4 py-2 text-sm font-bold text-[#6f543c] transition hover:bg-[#f7f3ee]"
+            >
+              Гарах
+            </button>
+          </form>
         </div>
       </header>
 
@@ -135,6 +145,104 @@ export default async function AdminDashboardPage() {
             </div>
           ))}
         </div>
+
+        <section className="mt-8 rounded-3xl border border-[#e6dbcf] bg-white p-6">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#7a9e8e]">
+                Системийн эрх
+              </p>
+              <h2 className="mt-1 font-display text-2xl font-semibold">
+                Admin хэрэглэгчид
+              </h2>
+            </div>
+            <span className="rounded-full bg-[#edf6f1] px-3 py-1 text-xs font-bold text-[#46675a]">
+              {adminUsers.length}
+            </span>
+          </div>
+          <div className="mt-4 divide-y divide-[#eee5dc]">
+            {adminUsers.length === 0 ? (
+              <p className="py-4 text-sm text-[#7d6f63]">
+                Admin хэрэглэгч бүртгэгдээгүй байна.
+              </p>
+            ) : (
+              adminUsers.map((user) => (
+                <div
+                  key={String(user.id)}
+                  className="flex flex-col gap-1 py-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="font-semibold text-[#2d2620]">
+                      {String(user.name || "Нэр оруулаагүй")}
+                    </p>
+                    <p className="text-sm text-[#7d6f63]">
+                      {String(user.email || "Имэйл оруулаагүй")}
+                    </p>
+                  </div>
+                  <span className="text-xs font-bold text-[#46675a]">
+                    {user.isActive === false ? "Идэвхгүй" : "Идэвхтэй"}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="mt-8 rounded-3xl border border-[#e6dbcf] bg-white p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#7a9e8e]">
+            Системийн эрх
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-semibold">
+            Шинэ admin account үүсгэх
+          </h2>
+          <p className="mt-2 text-sm text-[#7d6f63]">
+            Admin dashboard-д нэвтрэх эрхтэй шинэ хэрэглэгч үүсгэнэ.
+          </p>
+          <CreateAdminForm />
+        </section>
+
+        <section className="mt-8 rounded-3xl border border-[#e6dbcf] bg-white p-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#7a9e8e]">
+              Хэрэглэгчийн удирдлага
+            </p>
+            <h2 className="mt-1 font-display text-2xl font-semibold">
+              Бүх хэрэглэгчийн нууц үг
+            </h2>
+            <p className="mt-2 text-sm text-[#7d6f63]">
+              Admin, зөвлөх болон үйлчлүүлэгчийн нууц үгийг тус бүрээр нь шинэчилнэ.
+            </p>
+          </div>
+          <div className="mt-4 divide-y divide-[#eee5dc]">
+            {allUsers.length === 0 ? (
+              <p className="py-4 text-sm text-[#7d6f63]">
+                Хэрэглэгч бүртгэгдээгүй байна.
+              </p>
+            ) : (
+              allUsers.map((user) => (
+                <div
+                  key={String(user.id)}
+                  className="flex flex-col gap-3 py-4 lg:flex-row lg:items-center lg:justify-between"
+                >
+                  <div>
+                    <p className="font-semibold text-[#2d2620]">
+                      {String(user.name || "Нэр оруулаагүй")}
+                    </p>
+                    <p className="text-sm text-[#7d6f63]">
+                      {String(user.email || "Имэйл оруулаагүй")} ·{" "}
+                      {user.role === "admin"
+                        ? "Admin"
+                        : user.role === "counselor"
+                          ? "Зөвлөх"
+                          : "Үйлчлүүлэгч"}
+                    </p>
+                  </div>
+                  <AdminPasswordReset id={String(user.id)} />
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
         <section className="mt-8 space-y-4">
           {applications.length === 0 ? (

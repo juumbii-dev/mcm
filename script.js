@@ -713,10 +713,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    const adminTable = document.getElementById('admin-admin-list');
     const counselorTable = document.getElementById('admin-counselor-list');
     const clientTable = document.getElementById('admin-client-list');
     const adminCreateForm = document.getElementById('admin-create-form');
     const adminCreateMessage = document.getElementById('admin-create-message');
+    const adminPasswordForm = document.getElementById('admin-password-form');
+    const adminPasswordMessage = document.getElementById('admin-password-message');
 
     adminCreateForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -735,7 +738,44 @@ document.addEventListener('DOMContentLoaded', async () => {
       adminCreateMessage.textContent = response.ok
         ? 'Шинэ admin account амжилттай үүслээ.'
         : (result.error || 'Admin account үүсгэхэд алдаа гарлаа.');
-      if (response.ok) adminCreateForm.reset();
+      if (response.ok) {
+        adminCreateForm.reset();
+        await loadAdminUsers();
+      }
+    });
+
+    adminPasswordForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(adminPasswordForm);
+      const currentPassword = String(formData.get('currentPassword') || '');
+      const newPassword = String(formData.get('newPassword') || '');
+      const confirmPassword = String(formData.get('confirmPassword') || '');
+      if (newPassword.length < 8 || newPassword.length > 72) {
+        adminPasswordMessage.textContent = 'Шинэ нууц үг 8-72 тэмдэгт байх шаардлагатай.';
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        adminPasswordMessage.textContent = 'Шинэ нууц үг давхцахгүй байна.';
+        return;
+      }
+      const response = await fetch(`${apiBase}/api/auth`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${stored.token}` },
+        body: JSON.stringify({
+          action: 'changePassword',
+          id: stored.user.id,
+          currentPassword,
+          newPassword,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      adminPasswordMessage.textContent = response.ok
+        ? 'Өөрийн нууц үг амжилттай шинэчлэгдлээ.'
+        : (result.error || 'Нууц үг шинэчлэхэд алдаа гарлаа.');
+      if (response.ok) {
+        localStorage.setItem('mindconnect-auth', JSON.stringify(result));
+        adminPasswordForm.reset();
+      }
     });
 
     const escapeHtml = (value) => String(value ?? '')
@@ -774,7 +814,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           <button class="btn btn-secondary admin-save" data-user-id="${user.id}">Хадгалах</button>
           <button class="btn btn-danger admin-toggle" data-user-id="${user.id}" data-state="${user.isActive ? 'disable' : 'enable'}">${user.isActive ? 'Идэвхгүй болгох' : 'Идэвхжүүлэх'}</button>
           <button class="btn btn-danger admin-delete" data-user-id="${user.id}">Устгах</button>
+          <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;">
+            <input type="password" data-password-field="${user.id}" minlength="8" placeholder="Шинэ нууц үг" />
+            <button class="btn btn-secondary admin-password-save" data-user-id="${user.id}">Нууц үг солих</button>
+          </div>
         </td>
+      </tr>
+    `;
+    const renderAdminRow = (user) => `
+      <tr>
+        <td style="padding:0.5rem;">${escapeHtml(user.name || 'Нэр оруулаагүй')}</td>
+        <td style="padding:0.5rem;">${escapeHtml(user.email || 'Имэйл оруулаагүй')}</td>
+        <td style="padding:0.5rem;">${user.isActive ? 'Идэвхтэй' : 'Идэвхгүй'}</td>
       </tr>
     `;
 
@@ -784,15 +835,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       const result = await response.json();
       if (!response.ok) {
+        if (adminTable) adminTable.innerHTML = `<tr><td colspan="3"><p>Алдаа: ${result.error || 'Хэрэглэгчдийг ачаалж чадсангүй'}</p></td></tr>`;
         counselorTable.innerHTML = `<tr><td colspan="5"><p>Ошибка: ${result.error || 'Не удалось загрузить пользователей'}</p></td></tr>`;
         clientTable.innerHTML = `<tr><td colspan="5"><p>Ошибка: ${result.error || 'Не удалось загрузить пользователей'}</p></td></tr>`;
         return;
       }
 
-      const users = (result.users || []).filter((user) => user.role !== 'admin');
+      const users = result.users || [];
+      const admins = users.filter((user) => user.role === 'admin' || user.isAdmin);
       const counselors = users.filter((user) => user.role === 'counselor');
       const clients = users.filter((user) => user.role === 'client');
 
+      if (adminTable) {
+        adminTable.innerHTML = admins.length
+          ? admins.map(renderAdminRow).join('')
+          : '<tr><td colspan="3">Admin хэрэглэгч байхгүй байна.</td></tr>';
+      }
       counselorTable.innerHTML = counselors.length
         ? counselors.map(renderUserRow).join('')
         : '<tr><td colspan="5">Зөвлөх байхгүй байна.</td></tr>';
@@ -841,6 +899,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             await loadAdminUsers();
           } else {
             alert(result.error || 'Төлөв өөрчлөх үед алдаа гарлаа');
+          }
+        });
+      });
+
+      document.querySelectorAll('.admin-password-save').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const userId = Number(button.dataset.userId);
+          const passwordField = document.querySelector(`input[data-password-field="${userId}"]`);
+          const newPassword = passwordField ? passwordField.value : '';
+          if (newPassword.length < 8 || newPassword.length > 72) {
+            alert('Шинэ нууц үг 8-72 тэмдэгт байх шаардлагатай.');
+            return;
+          }
+          const response = await fetch(`${apiBase}/api/admin/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${stored.token}` },
+            body: JSON.stringify({ action: 'changePassword', id: userId, newPassword }),
+          });
+          const result = await response.json().catch(() => ({}));
+          if (response.ok) {
+            if (passwordField) passwordField.value = '';
+            alert('Нууц үг амжилттай шинэчлэгдлээ.');
+          } else {
+            alert(result.error || 'Нууц үг шинэчлэх үед алдаа гарлаа.');
           }
         });
       });
@@ -1310,12 +1392,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         phone: phoneInput.value,
         bio: bioInput.value || null,
       };
-      if (pwdInput.value) {
-        if (pwdInput.value.length < 6) {
-          alert('Нууц үг дор хаяж 6 тэмдэгт байх шаардлагатай.');
+      const currentPasswordInput = document.getElementById('profile-current-password');
+      const passwordConfirmInput = document.getElementById('profile-password-confirm');
+      const currentPassword = currentPasswordInput ? currentPasswordInput.value : '';
+      const passwordConfirm = passwordConfirmInput ? passwordConfirmInput.value : '';
+      if (pwdInput.value || currentPassword || passwordConfirm) {
+        if (!currentPassword || pwdInput.value.length < 8 || pwdInput.value.length > 72) {
+          alert('Одоогийн нууц үг болон 8-72 тэмдэгттэй шинэ нууц үг оруулна уу.');
           return;
         }
-        payload.password = pwdInput.value;
+        if (pwdInput.value !== passwordConfirm) {
+          alert('Шинэ нууц үг давхцахгүй байна.');
+          return;
+        }
       }
       if (activeProfileUser.role === 'counselor' || activeProfileUser.psychologistId) {
         payload.role = 'counselor';
@@ -1345,6 +1434,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await res.json();
       if (res.ok) {
         localStorage.setItem('mindconnect-auth', JSON.stringify(result));
+        if (pwdInput.value) {
+          const passwordResponse = await fetch(`${apiBase}/api/auth`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              action: 'changePassword',
+              id: activeProfileUser.id,
+              currentPassword,
+              newPassword: pwdInput.value,
+            }),
+          });
+          const passwordResult = await passwordResponse.json().catch(() => ({}));
+          if (!passwordResponse.ok) {
+            alert(passwordResult.error || 'Нууц үг солих үед алдаа гарлаа.');
+            return;
+          }
+          localStorage.setItem('mindconnect-auth', JSON.stringify(passwordResult));
+          if (currentPasswordInput) currentPasswordInput.value = '';
+          pwdInput.value = '';
+          if (passwordConfirmInput) passwordConfirmInput.value = '';
+        }
         notifyAuthUpdated();
         alert('Мэдээлэл амжилттай хадгалагдлаа.');
         // refresh state and header (and other UI areas)

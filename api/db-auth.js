@@ -33,6 +33,50 @@ async function handleAuth(req, res) {
 
       const data = JSON.parse(body);
       console.log('AUTH_PAYLOAD', data && data.action);
+      if (data.action === 'changePassword') {
+        const authHeader = req.headers && (req.headers.authorization || req.headers.Authorization) || '';
+        const tokenMatch = String(authHeader).match(/^Bearer\s+token-(\d+)$/);
+        const tokenUserId = tokenMatch ? Number(tokenMatch[1]) : null;
+        const targetId = data.id === undefined ? tokenUserId : Number(data.id);
+        const currentUser = tokenUserId ? await findUserById(tokenUserId) : null;
+        const newPassword = typeof data.newPassword === 'string' ? data.newPassword : '';
+
+        if (!currentUser) {
+          res.statusCode = 401;
+          res.end(JSON.stringify({ error: 'Нэвтрэх шаардлагатай' }));
+          return;
+        }
+        if (!targetId || (!currentUser.isAdmin && targetId !== tokenUserId)) {
+          res.statusCode = 403;
+          res.end(JSON.stringify({ error: 'Нууц үг өөрчлөх эрхгүй байна' }));
+          return;
+        }
+        if (newPassword.length < 8 || newPassword.length > 72) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'Нууц үг 8-72 тэмдэгт байх шаардлагатай' }));
+          return;
+        }
+        if (targetId === tokenUserId) {
+          const currentPassword = typeof data.currentPassword === 'string' ? data.currentPassword : '';
+          const verified = await findUserByCredentials(tokenUserId ? currentUser.email : '', hashPassword(currentPassword));
+          if (!verified) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Одоогийн нууц үг буруу байна' }));
+            return;
+          }
+        }
+
+        const user = await updateUser(targetId, { passwordHash: hashPassword(newPassword) });
+        if (!user) {
+          res.statusCode = 404;
+          res.end(JSON.stringify({ error: 'Хэрэглэгч олдсонгүй' }));
+          return;
+        }
+        res.statusCode = 200;
+        res.end(JSON.stringify({ ok: true, user, token: `token-${user.id}` }));
+        return;
+      }
+
       if (data.action === 'register') {
         const { name, email, phone, password, role, psychologistId, bio, experience, expertise, qualifications, city, age, avatar, gender, profession, marital_status, interests, issues } = data;
         if (!name || !email || !password) {
